@@ -5,4 +5,4 @@ The goal of this wiki is to concisely help you understand the ways we are using 
 
 > ### Getting Started
 > [GitHub Basics](https://github.com/3D-Animation-Cohort-of-2021/Senior-Game-2022/wiki/GitHub-Basics)
-#Rogue Inheritence
+# Rogue Inheritence
