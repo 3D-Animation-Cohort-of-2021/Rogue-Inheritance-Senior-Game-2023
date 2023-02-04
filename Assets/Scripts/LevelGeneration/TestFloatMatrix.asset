@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 420daa6876e3d1a41809b5b3fb143d58, type: 3}
+  m_Name: TestFloatMatrix
+  m_EditorClassIdentifier: 
+  occupiedRoom: {fileID: 3608714403622537418, guid: 6bc0b6a0f63ea514abc17b04454088da,
+    type: 3}
+  emptySlot: {fileID: 7623083712678911998, guid: 893fc5773d793194eaa089017b5a304e,
+    type: 3}
+  layoutSpacing: 2
