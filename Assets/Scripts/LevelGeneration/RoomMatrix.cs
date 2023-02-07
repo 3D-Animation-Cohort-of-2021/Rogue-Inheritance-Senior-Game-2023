@@ -5,12 +5,13 @@ using JetBrains.Annotations;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [CreateAssetMenu]
 public class RoomMatrix : ScriptableObject
 {
   public GameObject occupiedRoom, emptySlot;
-  private bool[,] grid = new bool[7, 7];
+  private bool[,] grid = new bool[5, 5];
   public float layoutSpacing;
 
   public int GetGridSize(int dimension)
@@ -19,6 +20,10 @@ public class RoomMatrix : ScriptableObject
       return 0;
     return grid.GetLength(dimension);
   }
+  
+/// <summary>
+/// Fills the matrix with empty room values
+/// </summary>
   public void ClearFloor()
   {
     for (int i = 0; i< grid.GetLength(0); i++)
@@ -28,23 +33,19 @@ public class RoomMatrix : ScriptableObject
       }
   }
 
-  public bool GetIndexValue(int x, int y)
-  {
-    return grid[x, y];
-  }
   public bool GetIndexValue(int[] coord)
   {
     return grid[coord[0], coord[1]];
   }
-  public void SetIndexValue(bool obj, int x, int y)
-  {
-    grid[x, y] = obj;
-  }
+  
   public void SetIndexValue(bool obj, int[] coord)
   {
     grid[coord[0], coord[1]] = obj;
   }
-
+  
+/// <summary>
+/// Reads the matrix and places a prefab in the world relative to each location in the matrix that contains a room
+/// </summary>
   public void LayoutFloor()
   {
     for (int i = 0; i< grid.GetLength(0); i++)
@@ -52,7 +53,7 @@ public class RoomMatrix : ScriptableObject
       {
         if (grid[i, j])
         {
-          Debug.Log("Room at "+i+", "+j);
+          //Debug.Log("Room at "+i+", "+j);
           Instantiate(occupiedRoom, new Vector3(i, 0, j)*layoutSpacing, quaternion.identity);
         }
         else
@@ -61,97 +62,126 @@ public class RoomMatrix : ScriptableObject
         }
       }
   }
-  /// <summary>
-  /// Returns the coordinates of the spot in (X) direction
-  /// </summary>
-  /// <param name="direction"> 0= up, 1=right, 2=down, 3=left</param>
-  /// <param name="xCoord">Current X coordinate</param>
-  /// <param name="yCoord">Current Y coordinate</param>
-  /// <returns>Returns</returns>
-  /// 
-  public int[] GetAdjacentCoordinate(int direction, int xCoord, int yCoord)
-  {//need to convert to array input
-    int[] coord;
+
+/// <summary>
+/// Returns the coordinates of the spot in (X) direction
+/// </summary>
+/// <param name="direction"> 0= up, 1=right, 2=down, 3=left</param>
+/// <param name="coord">Current X coordinate</param>
+/// <returns>Returns</returns>
+/// 
+  public int[] GetAdjacentCoordinate(int direction, int[] coord)
+  {
+    int[] adjCoord = new int[2];
+    if (direction>3)
+      Debug.Log("Invalid direction "+direction);
     switch (direction)
     {
-      case 0:
-        coord = new[] { xCoord, yCoord + 1 };
+      case 0://up
+        adjCoord = new int[] {coord[0], coord[1]+1};
         break;
-      case 1:
-        coord = new[] { xCoord + 1 , yCoord};
+      case 1://right
+        adjCoord = new int[] {coord[0] + 1, coord[1]};
         break;
-      case 2:
-        coord = new[] { xCoord, yCoord - 1 };
+      case 2://down
+        adjCoord = new int[] {coord[0], coord[1] - 1};
         break;
-      case 3:
-        coord = new[] { xCoord - 1, yCoord};
+      case 3://left
+        adjCoord = new int[] {coord[0] - 1, coord[1]};
         break;
       default:
         coord = null;
         break;
     }
-    if (coord == null || CoordinateIsOutOfBounds(coord[0], coord[1]))
-      return null;
-    return coord;
+    return coord == null ? null : adjCoord;
   }
 
-  public bool GetAdjacentStatus(int direction, int xCoord, int yCoord)
-  {
-    return GetIndexValue(GetAdjacentCoordinate(direction, xCoord, yCoord));
-  }
+/// <summary>
+/// Returns the current status of the adjacent coordinate in given direction
+/// </summary>
+/// <param name="direction">0= up, 1=right, 2=down, 3=left</param>
+/// <param name="coord"></param>
+/// <returns></returns>
   public bool GetAdjacentStatus(int direction, int[] coord)
   {
-    return GetIndexValue(GetAdjacentCoordinate(direction, coord[0], coord[1]));
+    return GetIndexValue(GetAdjacentCoordinate(direction, coord));
   }
-  
-  public bool CoordinateIsOutOfBounds(int x, int y)
-  {//need to convert to array input
-    if (x < 0 || x + 1 >= grid.GetLength(0))
+
+/// <summary>
+/// Checks to see if the given coordinate is out of the grid bounds
+/// </summary>
+/// <param name="coord"></param>
+/// <returns></returns>
+  public bool CoordinateIsOutOfBounds(int [] coord)
+  {
+    if (coord == null)
+    {
+      Debug.Log("Coordinate is null on boundary check");
       return true;
-    if (y < 0 || y + 1 >= grid.GetLength(1))
+    }
+    //Debug.Log("checking "+coord[0]+" "+coord[1]);
+    if (coord[0] < 0 || coord[0] >= grid.GetLength(0))
+      return true;
+    if (coord[1] < 0 || coord[1] >= grid.GetLength(1))
       return true;
     return false;
   }
 
-  public int[] FindFarthestFrom(int startX, int startY)
-  {//need to convert to array input
+/// <summary>
+/// Finds the farthest active coordinate in the grid from the given coordinate.
+/// </summary>
+/// <param name="startCoord"></param>
+/// <returns></returns>
+  public int[] FindFarthestFrom(int[] startCoord)
+  {
     int currentFarthestPath = 0;
     int thisPathLength;
-    int[] currentFarthestCoordinate = new int[]{0,0};
+    int[] currentFarthestCoordinate = {0,0};
     for (int i = 0; i< grid.GetLength(0); i++)
       for (int j = 0; j < grid.GetLength(1); j++)
       {
         if (grid[i, j])
         {
-          thisPathLength = (Math.Abs(startX - i) + Math.Abs(startY - j));
+          thisPathLength = (Math.Abs(startCoord[0] - i) + Math.Abs(startCoord[1] - j));
           if (thisPathLength > currentFarthestPath)
           {
             currentFarthestPath = thisPathLength;
             currentFarthestCoordinate[0] = i;
             currentFarthestCoordinate[1] = j;
           }
+          else if (thisPathLength==currentFarthestPath)
+            if (Random.Range(0, 2) == 0)
+            {
+              currentFarthestPath = thisPathLength;
+              currentFarthestCoordinate[0] = i;
+              currentFarthestCoordinate[1] = j;
+            }
         }
       }
     return currentFarthestCoordinate;
   }
-  /// <summary>
-  /// Get the number or weights of filled rooms that are adjacent to the given coordinate
-  /// </summary>
-  /// <param name="xCoord"></param>
-  /// <param name="yCoord"></param>
-  /// <returns>Room weight</returns>
-  public float GetCrowdedWeight(int xCoord, int yCoord)
-  {//need to convert to array input
-    float weight = 0;
+
+/// <summary>
+/// Returns the number(int) available to build adjacent to the given coordinate.
+/// </summary>
+/// <param name="coord">Queried coordinate</param>
+/// <returns>The number of available rooms to build</returns>
+  public int OpenBuildSpots(int[] coord)
+  {
+    int spots = 0;
+    int[] adjCoord;
     for (int i = 0; i < 4; i++)
     {
-      if (GetIndexValue(GetAdjacentCoordinate(i, xCoord, yCoord))) 
+      adjCoord = GetAdjacentCoordinate(i, coord);
+      if (!CoordinateIsOutOfBounds(adjCoord) && !GetIndexValue(adjCoord))
       {
-        weight += 1;
+        spots += 1;
       }
     }
-    return weight;
-  }
+  //Debug.Log(coord[0]+" "+coord[1]+" has "+spots+ "spots open to build");
+  return spots;
+}
+
 
   
 }
