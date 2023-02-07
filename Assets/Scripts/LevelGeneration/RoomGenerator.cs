@@ -25,12 +25,8 @@ public class RoomGenerator : MonoBehaviour
         currentCoord = startCoord;
         BuildRooms();
         gridObject.LayoutFloor();
-        int[] testCoord = startCoord;
-        for (int i = 0; i < 4; i++)
-        {
-            testCoord = gridObject.GetAdjacentCoordinate(i, currentCoord);
-            Debug.Log(testCoord[0]+" "+testCoord[1]);
-        }
+        gridObject.LayoutHallways();
+        
         
     }
 

@@ -10,8 +10,8 @@ using Random = UnityEngine.Random;
 [CreateAssetMenu]
 public class RoomMatrix : ScriptableObject
 {
-  public GameObject occupiedRoom, emptySlot;
-  private bool[,] grid = new bool[5, 5];
+  public GameObject occupiedRoom, emptySlot, hallway;
+  private bool[,] grid = new bool[9, 9];
   public float layoutSpacing;
 
   public int GetGridSize(int dimension)
@@ -63,12 +63,40 @@ public class RoomMatrix : ScriptableObject
       }
   }
 
+  public void LayoutHallways()
+  {
+    int[] temp = new int[2];
+    for (int i = 0; i < grid.GetLength(0); i++)
+    {
+      temp[0] = i;
+      for (int j = 0; j < grid.GetLength(1); j++)
+      {
+        temp[1] = j;
+        if (i<GetGridSize(0)-1&&GetIndexValue(temp)&&GetAdjacentStatus(1, temp))
+          Instantiate(hallway, new Vector3((i * layoutSpacing)+(layoutSpacing/2), 0, j * layoutSpacing),
+            Quaternion.Euler(new Vector3(0,0,90)));
+        if (j<GetGridSize(1)-1&&GetIndexValue(temp)&&GetAdjacentStatus(0, temp))
+          Instantiate(hallway, new Vector3(i * layoutSpacing, 0, (j * layoutSpacing)+(layoutSpacing/2)),
+            Quaternion.Euler(new Vector3(90, 0, 0)));
+      }
+    }
+    for (int i = 0; i < grid.GetLength(0); i++)
+    {
+      temp[0] = i;
+      for (int j = 0; j < grid.GetLength(1)-1; j++)
+      {
+        temp[1] = j;
+        
+      }
+    }
+  }
+
 /// <summary>
 /// Returns the coordinates of the spot in (X) direction
 /// </summary>
 /// <param name="direction"> 0= up, 1=right, 2=down, 3=left</param>
 /// <param name="coord">Current X coordinate</param>
-/// <returns>Returns</returns>
+/// <returns>Returns int array</returns>
 /// 
   public int[] GetAdjacentCoordinate(int direction, int[] coord)
   {
@@ -107,6 +135,10 @@ public class RoomMatrix : ScriptableObject
     return GetIndexValue(GetAdjacentCoordinate(direction, coord));
   }
 
+public bool AdjacentCoordinateIsOutOfBounds(int direction, int[] coord)
+{
+  return CoordinateIsOutOfBounds(GetAdjacentCoordinate(direction, coord));
+}
 /// <summary>
 /// Checks to see if the given coordinate is out of the grid bounds
 /// </summary>
