@@ -15,6 +15,7 @@ public class RoomGenerator : MonoBehaviour
     public int startRange;
     private int newX, newY;
     private bool currentRoomWillBuild;
+    private int[] currentCoordinate;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +24,7 @@ public class RoomGenerator : MonoBehaviour
         BuildFirstRoom();
         gridObject.LayoutFloor();
         
-        Debug.Log("The value above 3,4 is "+gridObject.GetAdjacentStatus(0, 3,4));
+        Debug.Log("The value above 3,4 is "+gridObject.GetIndexValue(gridObject.GetAdjacentCoordinate(0, 3, 4)));
     }
 
     public void BuildFirstRoom()
@@ -40,16 +41,28 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-   /* private void BuildRoom(int thisX, int thisY)
-    {
+    private void BuildRoom(int thisX, int thisY)
+    {//need to convert to array input
         while (currentRoomCount < finalRoomCount && currentRoomWillBuild)
         {
-            //Decide if and where to build room
-                
-            //Use coordinate of new room to call function again
+            currentRoomCount++;   
             BuildRoom(newX, newY);
         }
-    }*/
+    }
+
+    private void PickRoom(int xCoord, int yCoord)
+    {////need to convert to array input
+        int[] newCoord = gridObject.GetAdjacentCoordinate(Random.Range(0, 4), xCoord, yCoord);
+        if (gridObject.CoordinateIsOutOfBounds(xCoord, yCoord) || gridObject.GetIndexValue(newCoord))
+        {
+            PickRoom(xCoord, yCoord);
+        }
+        else
+        {
+            gridObject.SetIndexValue(true, newCoord);
+            currentCoordinate = newCoord;
+        }
+    }
     
     
 }

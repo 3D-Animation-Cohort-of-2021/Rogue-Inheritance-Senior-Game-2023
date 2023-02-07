@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -31,10 +32,17 @@ public class RoomMatrix : ScriptableObject
   {
     return grid[x, y];
   }
-
+  public bool GetIndexValue(int[] coord)
+  {
+    return grid[coord[0], coord[1]];
+  }
   public void SetIndexValue(bool obj, int x, int y)
   {
     grid[x, y] = obj;
+  }
+  public void SetIndexValue(bool obj, int[] coord)
+  {
+    grid[coord[0], coord[1]] = obj;
   }
 
   public void LayoutFloor()
@@ -53,101 +61,51 @@ public class RoomMatrix : ScriptableObject
         }
       }
   }
-  ///0=up, 1=right, 2=down, 3=left
-  public bool? GetAdjacentStatus(float direction, int currentIndexX, int currentIndexY)
-  {
+  /// <summary>
+  /// Returns the coordinates of the spot in (X) direction
+  /// </summary>
+  /// <param name="direction"> 0= up, 1=right, 2=down, 3=left</param>
+  /// <param name="xCoord">Current X coordinate</param>
+  /// <param name="yCoord">Current Y coordinate</param>
+  /// <returns>Returns</returns>
+  /// 
+  public int[] GetAdjacentCoordinate(int direction, int xCoord, int yCoord)
+  {//need to convert to array input
+    int[] coord;
     switch (direction)
     {
       case 0:
-      {
-        if (currentIndexY + 1 >= grid.GetLength(1))
-        {
-          Debug.Log("The index requested is out of the grid bounds");
-          return null;
-        }
-        return GetIndexValue(currentIndexX, currentIndexY + 1);
-      }
+        coord = new[] { xCoord, yCoord + 1 };
+        break;
       case 1:
-      {
-        if (currentIndexX+1>=grid.GetLength(0))
-        {
-          Debug.Log("The index requested is out of the grid bounds");
-          return null;
-        }
-        return GetIndexValue(currentIndexX + 1, currentIndexY);
-      }
+        coord = new[] { xCoord + 1 , yCoord};
+        break;
       case 2:
-      {
-        if(currentIndexY<=0)
-        {
-          Debug.Log("The index requested is out of the grid bounds");
-          return null;
-        }
-        return GetIndexValue(currentIndexX, currentIndexY - 1);
-      }
+        coord = new[] { xCoord, yCoord - 1 };
+        break;
       case 3:
-      {
-        if(currentIndexX<=0)
-        {
-          Debug.Log("The index requested is out of the grid bounds");
-          return null;
-        }
-        return GetIndexValue(currentIndexX - 1, currentIndexY);
-      }
+        coord = new[] { xCoord - 1, yCoord};
+        break;
       default:
-      {
-        Debug.Log("Invalid direction called for getting adjacent room");
-        return null;
-      }
+        coord = null;
+        break;
     }
+    if (coord == null || CoordinateIsOutOfBounds(coord[0], coord[1]))
+      return null;
+    return coord;
   }
 
-  public void SetAdjacentStatus(float direction, int currentIndexX, int currentIndexY, bool statusToSet)
+  public bool GetAdjacentStatus(int direction, int xCoord, int yCoord)
   {
-    switch (direction)
-    {
-      case 0:
-      {
-        if (currentIndexY + 1 >= grid.GetLength(1))
-          Debug.Log("The index requested is out of the grid bounds(Up)");
-        else
-          SetIndexValue(statusToSet, currentIndexX, currentIndexY + 1);
-        break;
-      }
-      case 1:
-      {
-        if (currentIndexX+1>=grid.GetLength(0))
-          Debug.Log("The index requested is out of the grid bounds(Right)");
-        else
-          SetIndexValue(statusToSet, currentIndexX + 1, currentIndexY);
-        break;
-      }
-      case 2:
-      {
-        if(currentIndexY<=0)
-          Debug.Log("The index requested is out of the grid bounds(Down)");
-        else
-         SetIndexValue(statusToSet, currentIndexX, currentIndexY - 1);
-        break;
-      }
-      case 3:
-      {
-        if(currentIndexX<=0)
-          Debug.Log("The index requested is out of the grid bounds(Down)");
-        else
-          SetIndexValue(statusToSet, currentIndexX - 1, currentIndexY);
-        break;
-      }
-      default:
-      {
-        Debug.Log("Invalid direction called for getting adjacent room");
-        break;
-      }
-    }
+    return GetIndexValue(GetAdjacentCoordinate(direction, xCoord, yCoord));
   }
-
+  public bool GetAdjacentStatus(int direction, int[] coord)
+  {
+    return GetIndexValue(GetAdjacentCoordinate(direction, coord[0], coord[1]));
+  }
+  
   public bool CoordinateIsOutOfBounds(int x, int y)
-  {
+  {//need to convert to array input
     if (x < 0 || x + 1 >= grid.GetLength(0))
       return true;
     if (y < 0 || y + 1 >= grid.GetLength(1))
@@ -156,7 +114,7 @@ public class RoomMatrix : ScriptableObject
   }
 
   public int[] FindFarthestFrom(int startX, int startY)
-  {
+  {//need to convert to array input
     int currentFarthestPath = 0;
     int thisPathLength;
     int[] currentFarthestCoordinate = new int[]{0,0};
@@ -176,4 +134,24 @@ public class RoomMatrix : ScriptableObject
       }
     return currentFarthestCoordinate;
   }
+  /// <summary>
+  /// Get the number or weights of filled rooms that are adjacent to the given coordinate
+  /// </summary>
+  /// <param name="xCoord"></param>
+  /// <param name="yCoord"></param>
+  /// <returns>Room weight</returns>
+  public float GetCrowdedWeight(int xCoord, int yCoord)
+  {//need to convert to array input
+    float weight = 0;
+    for (int i = 0; i < 4; i++)
+    {
+      if (GetIndexValue(GetAdjacentCoordinate(i, xCoord, yCoord))) 
+      {
+        weight += 1;
+      }
+    }
+    return weight;
+  }
+
+  
 }
