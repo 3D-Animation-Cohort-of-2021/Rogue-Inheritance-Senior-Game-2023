@@ -386,7 +386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridObject: {fileID: 11400000, guid: 55fdf2915da68a44fb2b2a939ed5e300, type: 2}
-  finalRoomCount: 10
+  finalRoomCount: 15
   currentRoomCount: 0
   startRange: 1
   currentRoomWillBuild: 1
