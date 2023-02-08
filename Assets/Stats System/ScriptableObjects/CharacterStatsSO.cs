@@ -8,11 +8,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharacterStats", menuName = "ScriptableObjects/StatsSystem/CharacterStats", order = 0)]
 public class CharacterStatsSO : ScriptableObject {
 
-    public int health = 0;
+    public int health = 1;
     public int strength = 1;
     public int agility = 1;
     public int wit = 1;
-    int inheritancePoints = 0;
+    int inheritancePoints = 1;
 
     /// <summary>
     /// Purpose: Construct the character stats with reference of parents' stats
@@ -22,7 +22,6 @@ public class CharacterStatsSO : ScriptableObject {
     public void Initialize(CharacterStatsSO prevCharacter, CharacterStatsSO spouse)
     {
         InheritStats(prevCharacter, spouse);
-        UpdateInheritancePoints();
     }
     /// <summary>
     /// Purpose: Construct the character stats with no parents
@@ -79,6 +78,8 @@ public class CharacterStatsSO : ScriptableObject {
         strength += Random.Range(-1, 1);
         agility += Random.Range(-1, 1);
         wit += Random.Range(-1, 1);
+
+        UpdateInheritancePoints();
     }
 
     /// <summary>
@@ -95,6 +96,7 @@ public class CharacterStatsSO : ScriptableObject {
     /// <returns>an integer with the </returns>
     public int GetInheritancePoints()
     {
+        UpdateInheritancePoints();
         return inheritancePoints;
     }
 

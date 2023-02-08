@@ -9,12 +9,24 @@ public class MassStatTester : MonoBehaviour
     public CharacterStatsSO prevCharacter;
     public CharacterStatsSO spouse;
 
+    private int[] highestStat = new int[4];
+
     // Start is called before the first frame update
     void Start()
     {
 
         VisualizeGrid();
+
+        PrintStatDistribution();
         
+    }
+
+    private void PrintStatDistribution()
+    {
+        Debug.Log($"Strength Characters: {highestStat[0]}");
+        Debug.Log($"Agility Characters: {highestStat[1]}");
+        Debug.Log($"Wit Characters: {highestStat[2]}");
+        Debug.Log($"Balanced Characters: {highestStat[3]}");
     }
 
     private void VisualizeGrid()
@@ -23,9 +35,10 @@ public class MassStatTester : MonoBehaviour
         {
             for(int j = 0; j < visualizerGridSize.y; j++)
             {
-                GameObject temp = Instantiate(statVisualizer, new Vector3((float)i, 0, (float)j), Quaternion.identity);
+                GameObject temp = Instantiate(statVisualizer, new Vector3((float)i - visualizerGridSize.x / 2, 0, (float)j - visualizerGridSize.y / 2), Quaternion.identity);
                 CharacterStatTester statTester = temp.GetComponent<CharacterStatTester>();
                 statTester.SetupStatVisualizer(prevCharacter, spouse);
+                highestStat[statTester.GetHighestStat()]++;
             }
         }
     }
@@ -38,4 +51,12 @@ public struct Vector2Int
 {
     public int x;
     public int y;
+}
+
+[System.Serializable]
+public struct Vector3Int
+{
+    public int x;
+    public int y;
+    public int z;
 }
