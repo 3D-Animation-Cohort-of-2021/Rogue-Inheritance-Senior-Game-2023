@@ -2,10 +2,13 @@
 //Last edited by: 
 //Purpose: This script uses InputSO's action maps to handle SO's and invoke input events
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PlayerInputs : MonoBehaviour
 {
+    public UnityEvent<Vector2> MoveInput;
+    public UnityEvent DashInput;
     public InputSO inputMap;
 
     private void Awake()
@@ -13,35 +16,39 @@ public class PlayerInputs : MonoBehaviour
         InputActionMap map = inputMap.map;
         for (int i = 0; i < map.actions.Count; i++)
         {
-            if (map.actions[i].name == "Move")
-            {
-                map.actions[i].started += MoveInput;
-                map.actions[i].performed += MoveInput;
-                map.actions[i].canceled += MoveInput;
-            }
-            if (map.actions[i].name == "Dash")
-            {
-                map.actions[i].started += DashInput;
-                map.actions[i].performed += DashInput;
-                map.actions[i].canceled += DashInput;
-            }
+            map.actions[i].started += HandleInput;
+            map.actions[i].performed += HandleInput;
+            map.actions[i].canceled += HandleInput;
             map.actions[i].Enable();
         }
     }
 
     /// <summary>
-    /// Invokes an event to send data to a controller when move inputs are pressed
+    /// Invokes an event to send data to a controller when inputs are pressed
     /// </summary>
-    private void MoveInput(InputAction.CallbackContext context)
+    private void HandleInput(InputAction.CallbackContext context)
     {
-        Debug.Log("Moving");
+        if (context.action.name == "Move")
+        {
+            MoveInput.Invoke(context.ReadValue<Vector2>());
+        }
+        if (context.action.name == "Look")
+        {
+            Debug.Log("Looking");
+        }
+        if (context.action.name == "Dash" && context.started)
+        {
+            DashInput.Invoke();
+        }
+        if (context.action.name == "Interact" && context.started)
+        {
+            Debug.Log("Interact");
+        }
+        if (context.action.name == "Back" && context.started)
+        {
+            Debug.Log("Back");
+        }
+        
     }
-    /// <summary>
-    /// Invokes an event to send data to a controller when dash inputs are pressed
-    /// </summary>
-    private void DashInput(InputAction.CallbackContext context)
-    {
-        Debug.Log("Dash");
-    }
-    
+
 }
