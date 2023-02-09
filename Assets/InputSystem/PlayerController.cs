@@ -1,4 +1,6 @@
-using System;
+//Created by: DJ Swiggett
+//Last edited by: 
+//Purpose: This script controls the players movement
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
