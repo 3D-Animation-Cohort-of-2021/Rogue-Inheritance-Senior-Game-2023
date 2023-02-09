@@ -32,18 +32,15 @@ public class RoomMatrix : ScriptableObject
         grid[i, j] = false;
       }
   }
-
-  public bool GetIndexValue(int[] coord)
+public bool GetIndexValue(int[] coord)
   {
     return grid[coord[0], coord[1]];
   }
-  
   public void SetIndexValue(bool obj, int[] coord)
   {
     grid[coord[0], coord[1]] = obj;
   }
-  
-/// <summary>
+  /// <summary>
 /// Reads the matrix and places a prefab in the world relative to each location in the matrix that contains a room
 /// </summary>
   public void LayoutFloor()
@@ -62,7 +59,9 @@ public class RoomMatrix : ScriptableObject
         }
       }
   }
-
+/// <summary>
+/// Reads each room in the matrix to see if there needs to be a hallway to the room above or to the right
+/// </summary>
   public void LayoutHallways()
   {
     int[] temp = new int[2];
@@ -134,11 +133,16 @@ public class RoomMatrix : ScriptableObject
   {
     return GetIndexValue(GetAdjacentCoordinate(direction, coord));
   }
-
-public bool AdjacentCoordinateIsOutOfBounds(int direction, int[] coord)
-{
-  return CoordinateIsOutOfBounds(GetAdjacentCoordinate(direction, coord));
-}
+/// <summary>
+/// Returns whether or not the requested coordinate adjacent in (x) direction is out of the matrix bounds
+/// </summary>
+/// <param name="direction"></param>
+/// <param name="coord"></param>
+/// <returns>boolean</returns>
+  public bool AdjacentCoordinateIsOutOfBounds(int direction, int[] coord)
+  {
+    return CoordinateIsOutOfBounds(GetAdjacentCoordinate(direction, coord));
+  }
 /// <summary>
 /// Checks to see if the given coordinate is out of the grid bounds
 /// </summary>
@@ -210,8 +214,7 @@ public bool AdjacentCoordinateIsOutOfBounds(int direction, int[] coord)
         spots += 1;
       }
     }
-  //Debug.Log(coord[0]+" "+coord[1]+" has "+spots+ "spots open to build");
-  return spots;
+    return spots;
 }
 
 

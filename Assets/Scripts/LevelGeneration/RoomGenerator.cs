@@ -15,8 +15,6 @@ public class RoomGenerator : MonoBehaviour
     public int startRange;
     private int newX, newY;
     [SerializeField]private bool currentRoomWillBuild;
-
-    // Start is called before the first frame update
     void Start()
     {
         gridObject.ClearFloor();
@@ -26,10 +24,10 @@ public class RoomGenerator : MonoBehaviour
         BuildRooms();
         gridObject.LayoutFloor();
         gridObject.LayoutHallways();
-        
-        
     }
-
+/// <summary>
+/// Picks and assigns the first room of the matrix
+/// </summary>
     public void BuildFirstRoom()
     {
         gridXsize = gridObject.GetGridSize(0);
@@ -44,7 +42,9 @@ public class RoomGenerator : MonoBehaviour
         }
         Debug.Log("First room is"+ startCoord);
     }
-
+/// <summary>
+/// Recursive Function: Decides if the current room will build and where to build it.
+/// </summary>
     private void BuildRooms()
     {
         if (gridObject.OpenBuildSpots(currentCoord) == 0)
@@ -59,7 +59,11 @@ public class RoomGenerator : MonoBehaviour
             BuildRooms();
         }
     }
-
+/// <summary>
+/// Called by BuildRooms(): takes the current coordinate and returns the new coordinate to build in.
+/// </summary>
+/// <param name="thisCurrentCoord">The current coordinate</param>
+/// <returns>The new coordinate that was chosen</returns>
     private int[] PickRoom(int[] thisCurrentCoord)
     {
         int[] thisNewCoord = gridObject.GetAdjacentCoordinate(Random.Range(0, 4), thisCurrentCoord);
