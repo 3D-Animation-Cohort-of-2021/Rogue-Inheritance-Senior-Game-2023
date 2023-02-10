@@ -13,15 +13,18 @@ public class RoomGenerator : MonoBehaviour
     private float gridXsize, gridYsize;
     private int[] startCoord, newCoord, currentCoord;
     public int startRange;
-    private int newX, newY;
-    [SerializeField]private bool currentRoomWillBuild;
+    private int newX, newY, currentStepsFromStart, mostStepsFromStart;
+    [SerializeField] private int backTrackDelay;
+    [SerializeField]private bool currentRoomWillBuild, buildingRooms;
+    public float chanceToBackTrack;
     void Start()
     {
         gridObject.ClearFloor();
         startCoord = new[] {0, 0};
         BuildFirstRoom();
         currentCoord = startCoord;
-        BuildRooms();
+        BuildRooms(startCoord);
+        gridObject.SetIndexValue(eRoom.EndRoom, gridObject.FindFarthestFrom(startCoord));
         gridObject.LayoutFloor();
         gridObject.LayoutHallways();
     }
@@ -38,25 +41,40 @@ public class RoomGenerator : MonoBehaviour
         startCoord[1] = Random.Range((startCoord[1] - startRange)-1, startCoord[1] + startRange);
         if (!gridObject.CoordinateIsOutOfBounds(startCoord))
         {
-            gridObject.SetIndexValue(true, startCoord);
+            gridObject.SetIndexValue(eRoom.StartRoom, startCoord);
         }
-        Debug.Log("First room is"+ startCoord);
+        Debug.Log("First room is"+ startCoord[0]+""+startCoord[1]);
     }
 /// <summary>
 /// Recursive Function: Decides if the current room will build and where to build it.
 /// </summary>
-    private void BuildRooms()
-    {
+    private void BuildRooms(int[] thisLayerCoord)
+{
         if (gridObject.OpenBuildSpots(currentCoord) == 0)
-            currentRoomWillBuild=false;
-        while (currentRoomCount < finalRoomCount && currentRoomWillBuild)
         {
-            Debug.Log(currentCoord[0]+" "+currentCoord[1]);
-            newCoord = PickRoom(currentCoord);
-            gridObject.SetIndexValue(true, newCoord);
+            Debug.Log(currentCoord[0]+" "+currentCoord[1]+"Could not build");
+            return;
+        }
+        while (currentRoomCount < finalRoomCount)
+        {
+            currentCoord = thisLayerCoord;
+            if (gridObject.OpenBuildSpots(currentCoord) == 0)
+            {
+                Debug.Log(currentCoord[0]+" "+currentCoord[1]+"Has no open spots to build"); 
+                return;
+            }
+            if(currentRoomCount>backTrackDelay)
+                if (Random.Range(0, 100) < chanceToBackTrack)
+                {
+                    Debug.Log(currentCoord[0]+" "+currentCoord[1]+"Chose to not build"); 
+                    return;
+                }
+            newCoord = gridObject.FindBestRoom(currentCoord);
+            gridObject.SetIndexValue(eRoom.Occupied, newCoord);
             currentRoomCount++;
             currentCoord = newCoord;
-            BuildRooms();
+            Debug.Log(currentCoord[0]+" "+currentCoord[1]);
+            BuildRooms(currentCoord);
         }
     }
 /// <summary>
@@ -67,13 +85,12 @@ public class RoomGenerator : MonoBehaviour
     private int[] PickRoom(int[] thisCurrentCoord)
     {
         int[] thisNewCoord = gridObject.GetAdjacentCoordinate(Random.Range(0, 4), thisCurrentCoord);
-        if (gridObject.CoordinateIsOutOfBounds(thisNewCoord) || gridObject.GetIndexValue(thisNewCoord))
+        if (gridObject.CoordinateIsOutOfBounds(thisNewCoord) || gridObject.IndexHasRoom(thisNewCoord))
         {
             thisNewCoord = PickRoom(thisCurrentCoord);
         }
         //Debug.Log(thisNewCoord[0]+" "+thisNewCoord[1]);
         return thisNewCoord;
     }
-    
-    
+
 }

@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   occupiedRoom: {fileID: 3608714403622537418, guid: 6bc0b6a0f63ea514abc17b04454088da,
     type: 3}
+  endRoom: {fileID: 3608714403622537418, guid: fba63c172f6142f479b6b1788ade0a67, type: 3}
+  startRoom: {fileID: 3608714403622537418, guid: b4beb8d79a4313640831eb60d32cf661,
+    type: 3}
   emptySlot: {fileID: 7623083712678911998, guid: 893fc5773d793194eaa089017b5a304e,
     type: 3}
   hallway: {fileID: 1114433575978653121, guid: 4413f1df7c9155c40942bc9308b6b95a, type: 3}

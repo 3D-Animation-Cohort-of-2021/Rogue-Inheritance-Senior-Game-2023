@@ -10,9 +10,11 @@ using Random = UnityEngine.Random;
 [CreateAssetMenu]
 public class RoomMatrix : ScriptableObject
 {
-  public GameObject occupiedRoom, emptySlot, hallway;
-  private bool[,] grid = new bool[9, 9];
+  public GameObject occupiedRoom, endRoom, startRoom, emptySlot, hallway;
+  private eRoom[,] grid = new eRoom[12, 12];
   public float layoutSpacing;
+  private Vector3 placingVector;
+  List<int[]> possibleRooms = new List<int[]>();
 
   public int GetGridSize(int dimension)
   {
@@ -29,14 +31,19 @@ public class RoomMatrix : ScriptableObject
     for (int i = 0; i< grid.GetLength(0); i++)
       for (int j = 0; j < grid.GetLength(1); j++)
       {
-        grid[i, j] = false;
+        grid[i, j] = eRoom.Empty;
       }
   }
-public bool GetIndexValue(int[] coord)
+public eRoom GetIndexValue(int[] coord)
   {
     return grid[coord[0], coord[1]];
   }
-  public void SetIndexValue(bool obj, int[] coord)
+
+public bool IndexHasRoom(int[] coord)
+{
+  return GetIndexValue(coord) != eRoom.Empty;
+}
+  public void SetIndexValue(eRoom obj, int[] coord)
   {
     grid[coord[0], coord[1]] = obj;
   }
@@ -45,10 +52,39 @@ public bool GetIndexValue(int[] coord)
 /// </summary>
   public void LayoutFloor()
   {
-    for (int i = 0; i< grid.GetLength(0); i++)
+    int[] currentSlot = {0,0};
+    for (int i = 0; i < grid.GetLength(0); i++)
+    {
+      currentSlot[0] = i;
+      placingVector.x = i * layoutSpacing;
       for (int j = 0; j < grid.GetLength(1); j++)
       {
-        if (grid[i, j])
+        currentSlot[1] = j;
+        placingVector.z = j * layoutSpacing;
+        switch (GetIndexValue(currentSlot))
+        {
+          case eRoom.Occupied:
+          {
+            Instantiate(occupiedRoom, placingVector, quaternion.identity);
+            break;
+          }
+          case eRoom.StartRoom:
+          {
+            Instantiate(startRoom, placingVector, quaternion.identity);
+            break;
+          }
+          case eRoom.EndRoom:
+          {
+            Instantiate(endRoom, placingVector, quaternion.identity);
+            break;
+          }
+          case eRoom.Empty:
+          {
+            Instantiate(emptySlot, placingVector, quaternion.identity);
+            break;
+          }
+        }
+        /*if (grid[i, j]!=eRoom.Empty)
         {
           //Debug.Log("Room at "+i+", "+j);
           Instantiate(occupiedRoom, new Vector3(i, 0, j)*layoutSpacing, quaternion.identity);
@@ -56,8 +92,9 @@ public bool GetIndexValue(int[] coord)
         else
         {
           Instantiate(emptySlot, new Vector3(i, 0, j)*layoutSpacing, quaternion.identity);
-        }
+        }*/
       }
+    }
   }
 /// <summary>
 /// Reads each room in the matrix to see if there needs to be a hallway to the room above or to the right
@@ -71,10 +108,10 @@ public bool GetIndexValue(int[] coord)
       for (int j = 0; j < grid.GetLength(1); j++)
       {
         temp[1] = j;
-        if (i<GetGridSize(0)-1&&GetIndexValue(temp)&&GetAdjacentStatus(1, temp))
+        if (i<GetGridSize(0)-1&&IndexHasRoom(temp)&&GetAdjacentHasRoom(1, temp))
           Instantiate(hallway, new Vector3((i * layoutSpacing)+(layoutSpacing/2), 0, j * layoutSpacing),
             Quaternion.Euler(new Vector3(0,0,90)));
-        if (j<GetGridSize(1)-1&&GetIndexValue(temp)&&GetAdjacentStatus(0, temp))
+        if (j<GetGridSize(1)-1&&IndexHasRoom(temp)&&GetAdjacentHasRoom(0, temp))
           Instantiate(hallway, new Vector3(i * layoutSpacing, 0, (j * layoutSpacing)+(layoutSpacing/2)),
             Quaternion.Euler(new Vector3(90, 0, 0)));
       }
@@ -98,29 +135,29 @@ public bool GetIndexValue(int[] coord)
 /// <returns>Returns int array</returns>
 /// 
   public int[] GetAdjacentCoordinate(int direction, int[] coord)
-  {
-    int[] adjCoord = new int[2];
-    if (direction>3)
+{
+  if (direction>3)
       Debug.Log("Invalid direction "+direction);
-    switch (direction)
-    {
-      case 0://up
-        adjCoord = new int[] {coord[0], coord[1]+1};
-        break;
-      case 1://right
-        adjCoord = new int[] {coord[0] + 1, coord[1]};
-        break;
-      case 2://down
-        adjCoord = new int[] {coord[0], coord[1] - 1};
-        break;
-      case 3://left
-        adjCoord = new int[] {coord[0] - 1, coord[1]};
-        break;
-      default:
-        coord = null;
-        break;
-    }
-    return coord == null ? null : adjCoord;
+  int[] adjCoord = new int[] { };
+  switch (direction)
+  {
+    case 0://up
+      adjCoord = new int[] {coord[0], coord[1]+1};
+      break;
+    case 1://right
+      adjCoord = new int[] {coord[0] + 1, coord[1]};
+      break;
+    case 2://down
+      adjCoord = new int[] {coord[0], coord[1] - 1};
+      break;
+    case 3://left
+      adjCoord = new int[] {coord[0] - 1, coord[1]};
+      break;
+    default:
+      coord = null;
+      break;
+  }
+  return coord == null ? null : adjCoord;
   }
 
 /// <summary>
@@ -129,10 +166,15 @@ public bool GetIndexValue(int[] coord)
 /// <param name="direction">0= up, 1=right, 2=down, 3=left</param>
 /// <param name="coord"></param>
 /// <returns></returns>
-  public bool GetAdjacentStatus(int direction, int[] coord)
+  public bool GetAdjacentHasRoom(int direction, int[] coord)
   {
-    return GetIndexValue(GetAdjacentCoordinate(direction, coord));
+    return IndexHasRoom(GetAdjacentCoordinate(direction, coord));
   }
+
+public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
+{
+  return GetIndexValue(GetAdjacentCoordinate(direction, coord));
+}
 /// <summary>
 /// Returns whether or not the requested coordinate adjacent in (x) direction is out of the matrix bounds
 /// </summary>
@@ -176,7 +218,7 @@ public bool GetIndexValue(int[] coord)
     for (int i = 0; i< grid.GetLength(0); i++)
       for (int j = 0; j < grid.GetLength(1); j++)
       {
-        if (grid[i, j])
+        if (grid[i, j]!=eRoom.Empty)
         {
           thisPathLength = (Math.Abs(startCoord[0] - i) + Math.Abs(startCoord[1] - j));
           if (thisPathLength > currentFarthestPath)
@@ -209,12 +251,30 @@ public bool GetIndexValue(int[] coord)
     for (int i = 0; i < 4; i++)
     {
       adjCoord = GetAdjacentCoordinate(i, coord);
-      if (!CoordinateIsOutOfBounds(adjCoord) && !GetIndexValue(adjCoord))
+      if (!CoordinateIsOutOfBounds(adjCoord) && !IndexHasRoom(adjCoord))
       {
         spots += 1;
       }
     }
     return spots;
+}
+
+public int[] FindBestRoom(int[] coord)
+{
+  int[] queryCoord;
+  possibleRooms.Clear();
+  for (int i = 0; i < 4; i++)
+  {
+    queryCoord = GetAdjacentCoordinate(i, coord);
+    if (!CoordinateIsOutOfBounds(queryCoord) && !IndexHasRoom(queryCoord))
+    {
+      possibleRooms.Add(queryCoord);
+    }
+  }
+  
+  int chosenIndex = Random.Range(0, possibleRooms.Count - 1);
+  Debug.Log(chosenIndex+" of "+OpenBuildSpots(coord));
+  return possibleRooms[chosenIndex];
 }
 
 
