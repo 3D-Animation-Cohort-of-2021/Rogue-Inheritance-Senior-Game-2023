@@ -16,9 +16,44 @@ MonoBehaviour:
   - m_GameObject: {fileID: 1003347435863157632, guid: 47a995dfcc14d8d629ad384776e7ac10,
       type: 3}
     m_Offset: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
     m_Orientation: {x: 0, y: 0, z: 0, w: 0}
-  m_Size: {x: 2, y: 1, z: 2}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  - m_GameObject: {fileID: 4681001753681408073, guid: 61ea47d68422393b5a15490783f7925a,
+      type: 3}
+    m_Offset: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    m_Orientation: {x: 0, y: 0, z: 0, w: 0}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Pivot: {x: 0, y: 0, z: 0}
   m_CanChangeZPosition: 0
   hiddenGridLayout:
@@ -28,3 +63,4 @@ MonoBehaviour:
     cellSwizzle: 0
   hiddenGrid: {fileID: 0}
   m_Anchor: {x: 0.5, y: 0.5, z: 0.5}
+  replaceTiles: 1
