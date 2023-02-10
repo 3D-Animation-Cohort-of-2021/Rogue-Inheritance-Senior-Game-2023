@@ -34,15 +34,19 @@ public class RoomMatrix : ScriptableObject
         grid[i, j] = eRoom.Empty;
       }
   }
-public eRoom GetIndexValue(int[] coord)
+  public eRoom GetIndexValue(int[] coord)
   {
     return grid[coord[0], coord[1]];
   }
-
-public bool IndexHasRoom(int[] coord)
-{
-  return GetIndexValue(coord) != eRoom.Empty;
-}
+  /// <summary>
+  /// Checks to see if the coordinate is "unoccupied"
+  /// </summary>
+  /// <param name="coord">Coordinate</param>
+  /// <returns>Enum eRoom</returns>
+  public bool IndexHasRoom(int[] coord)
+  {
+    return GetIndexValue(coord) != eRoom.Empty;
+  }
   public void SetIndexValue(eRoom obj, int[] coord)
   {
     grid[coord[0], coord[1]] = obj;
@@ -50,7 +54,7 @@ public bool IndexHasRoom(int[] coord)
   /// <summary>
 /// Reads the matrix and places a prefab in the world relative to each location in the matrix that contains a room
 /// </summary>
-  public void LayoutFloor()
+  public void LayoutFloor(bool generateEmptyRooms)
   {
     int[] currentSlot = {0,0};
     for (int i = 0; i < grid.GetLength(0); i++)
@@ -80,19 +84,11 @@ public bool IndexHasRoom(int[] coord)
           }
           case eRoom.Empty:
           {
-            Instantiate(emptySlot, placingVector, quaternion.identity);
+            if(generateEmptyRooms)
+              Instantiate(emptySlot, placingVector, quaternion.identity);
             break;
           }
         }
-        /*if (grid[i, j]!=eRoom.Empty)
-        {
-          //Debug.Log("Room at "+i+", "+j);
-          Instantiate(occupiedRoom, new Vector3(i, 0, j)*layoutSpacing, quaternion.identity);
-        }
-        else
-        {
-          Instantiate(emptySlot, new Vector3(i, 0, j)*layoutSpacing, quaternion.identity);
-        }*/
       }
     }
   }
@@ -258,7 +254,11 @@ public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
     }
     return spots;
 }
-
+/// <summary>
+/// Picks randomly from available rooms without using recursion
+/// </summary>
+/// <param name="coord"></param>
+/// <returns>Coordinate (int[])</returns>
 public int[] FindBestRoom(int[] coord)
 {
   int[] queryCoord;
@@ -271,9 +271,8 @@ public int[] FindBestRoom(int[] coord)
       possibleRooms.Add(queryCoord);
     }
   }
-  
   int chosenIndex = Random.Range(0, possibleRooms.Count - 1);
-  Debug.Log(chosenIndex+" of "+OpenBuildSpots(coord));
+  //Debug.Log(chosenIndex+" of "+OpenBuildSpots(coord));
   return possibleRooms[chosenIndex];
 }
 

@@ -389,9 +389,9 @@ MonoBehaviour:
   finalRoomCount: 12
   currentRoomCount: 0
   startRange: 3
-  backTrackDelay: 0
+  backTrackDelay: 3
   currentRoomWillBuild: 1
-  buildingRooms: 0
+  buildEmptyRooms: 0
   chanceToBackTrack: 25
 --- !u!4 &1739260828
 Transform:

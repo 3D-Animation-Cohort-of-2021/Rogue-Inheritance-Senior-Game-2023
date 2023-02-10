@@ -15,7 +15,7 @@ public class RoomGenerator : MonoBehaviour
     public int startRange;
     private int newX, newY, currentStepsFromStart, mostStepsFromStart;
     [SerializeField] private int backTrackDelay;
-    [SerializeField]private bool currentRoomWillBuild, buildingRooms;
+    [SerializeField]private bool currentRoomWillBuild, buildEmptyRooms;
     public float chanceToBackTrack;
     void Start()
     {
@@ -25,7 +25,7 @@ public class RoomGenerator : MonoBehaviour
         currentCoord = startCoord;
         BuildRooms(startCoord);
         gridObject.SetIndexValue(eRoom.EndRoom, gridObject.FindFarthestFrom(startCoord));
-        gridObject.LayoutFloor();
+        gridObject.LayoutFloor(buildEmptyRooms);
         gridObject.LayoutHallways();
     }
 /// <summary>
@@ -79,7 +79,7 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 /// <summary>
-/// REDUNDANT-USE MATRIX.FINDBESTROOM-Called by BuildRooms(): takes the current coordinate and returns the new coordinate to build in.
+/// REDUNDANT-USE MATRIX.FINDBESTROOM INSTEAD-: takes the current coordinate and returns the new coordinate to build in.
 /// </summary>
 /// <param name="thisCurrentCoord">The current coordinate</param>
 /// <returns>The new coordinate that was chosen</returns>
