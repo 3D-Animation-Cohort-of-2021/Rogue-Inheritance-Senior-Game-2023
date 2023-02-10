@@ -386,10 +386,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridObject: {fileID: 11400000, guid: 55fdf2915da68a44fb2b2a939ed5e300, type: 2}
-  finalRoomCount: 15
+  finalRoomCount: 12
   currentRoomCount: 0
-  startRange: 1
+  startRange: 3
+  backTrackDelay: 0
   currentRoomWillBuild: 1
+  buildingRooms: 0
+  chanceToBackTrack: 25
 --- !u!4 &1739260828
 Transform:
   m_ObjectHideFlags: 0

@@ -48,6 +48,7 @@ public class RoomGenerator : MonoBehaviour
 /// <summary>
 /// Recursive Function: Decides if the current room will build and where to build it.
 /// </summary>
+/// <param name="thisLayerCoord">The current coordinate that this layer of recursion is referring to. Initial call with the start coordinate</param>
     private void BuildRooms(int[] thisLayerCoord)
 {
         if (gridObject.OpenBuildSpots(currentCoord) == 0)
@@ -78,7 +79,7 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 /// <summary>
-/// Called by BuildRooms(): takes the current coordinate and returns the new coordinate to build in.
+/// REDUNDANT-USE MATRIX.FINDBESTROOM-Called by BuildRooms(): takes the current coordinate and returns the new coordinate to build in.
 /// </summary>
 /// <param name="thisCurrentCoord">The current coordinate</param>
 /// <returns>The new coordinate that was chosen</returns>
