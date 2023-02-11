@@ -28,7 +28,7 @@ public class RoomPrefabBaker : MonoBehaviour
             for(int i = 0; i < transform.childCount; i++)
             {
                 Transform child = transform.GetChild(i);
-                if(child.GetComponentInChildren<Tilemap>() != null)
+                if(child.childCount != 0)
                 {
 
                     PrefabUtility.SaveAsPrefabAssetAndConnect(child.gameObject, folderPath + "/" + child.gameObject.name + ".prefab", InteractionMode.UserAction);

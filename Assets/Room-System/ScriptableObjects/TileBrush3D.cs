@@ -168,8 +168,6 @@ public class TileBrush3DEditor : Editor
 
             GUIStyle listStyle = new GUIStyle();
 
-            
-
             listStyle.normal.background = Texture2D.blackTexture;
 
             Color[] pixels = listStyle.normal.background.GetPixels();
@@ -183,12 +181,14 @@ public class TileBrush3DEditor : Editor
             listStyle.normal.background.Apply();
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, listStyle, GUILayout.Width(EditorGUIUtility.currentViewWidth - 10), GUILayout.Height(300));
+
+            
             for(int i = 0; i < tileBrush3DInstance.cells.Length; i++)
             {
                 int widthMod = 1;
                 if(tileBrush3DInstance.cells[i].gameObject != null)
                 {
-
+                    
                     Texture2D assetPreview = AssetPreview.GetAssetPreview(tileBrush3DInstance.cells[i].gameObject);
                     GUIContent content = new GUIContent((assetPreview), tileBrush3DInstance.cells[i].gameObject.name);
                     
@@ -208,7 +208,7 @@ public class TileBrush3DEditor : Editor
                         GUILayout.BeginHorizontal();
                     }
 
-                    if(GUILayout.Button(content, GUILayout.Width(assetPreview.width)))
+                    if(GUILayout.Button(content, GUILayout.Width(assetPreview != null ? assetPreview.width : 150)))
                     {
                         tileBrush3DInstance.SetCurrentCell(tileBrush3DInstance.cells[i]);
                     }
@@ -219,6 +219,10 @@ public class TileBrush3DEditor : Editor
                     }
 
                     nonNullIndex++;
+                }
+                else if(i != 0 && nonNullIndex != 0 && i == tileBrush3DInstance.cells.Length - 1 && (nonNullIndex % widthMod != 0 || widthMod == 1) )
+                {
+                    GUILayout.EndHorizontal();
                 }
             }
             GUILayout.EndScrollView();
