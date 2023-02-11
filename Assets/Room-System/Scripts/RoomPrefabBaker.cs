@@ -36,7 +36,15 @@ public class RoomPrefabBaker : MonoBehaviour
                 }
             }
 
+            for(int i = transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = transform.GetChild(i);
+                Destroy(child);
+            }
+
         }
+
+        Instantiate(new GameObject(), transform);
 
         return success;
     }
