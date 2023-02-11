@@ -131,8 +131,8 @@ public class TileBrush3D : GameObjectBrush
     private static Transform GetObjectInCell(GridLayout grid, Transform parent, Vector3Int position)
     {
         int childCount = parent.childCount;
-        Vector3 min = grid.LocalToWorld(grid.CellToLocalInterpolated(position));
-        Vector3 max = grid.LocalToWorld(grid.CellToLocalInterpolated(position + Vector3Int.one));
+        Vector3 min = grid.LocalToWorld(grid.CellToLocalInterpolated(position - Vector3Int.one / 2)) + Vector3.down * 3;
+        Vector3 max = grid.LocalToWorld(grid.CellToLocalInterpolated(position + Vector3Int.one + Vector3Int.one / 2)) + Vector3.up * 6;
         Bounds bounds = new Bounds((max + min) * 0.5f, max - min);
 
         for(int i = 0; i < childCount; i++)
@@ -149,9 +149,11 @@ public class TileBrush3D : GameObjectBrush
 
 }
 
+
+
 #if UNITY_EDITOR
 [CustomEditor(typeof(TileBrush3D))]
-public class AnimatedTileEditor : Editor
+public class TileBrush3DEditor : Editor
     {
         Vector2 scrollPosition = Vector2.zero;
 
@@ -191,7 +193,7 @@ public class AnimatedTileEditor : Editor
                     GUIContent content = new GUIContent((assetPreview), tileBrush3DInstance.cells[i].gameObject.name);
                     
 
-                    if((int)assetPreview.width > 0)
+                    if(assetPreview != null && (int)assetPreview.width > 0)
                     {
                         widthMod = (int)EditorGUIUtility.currentViewWidth / (int)assetPreview.width;
                     }
