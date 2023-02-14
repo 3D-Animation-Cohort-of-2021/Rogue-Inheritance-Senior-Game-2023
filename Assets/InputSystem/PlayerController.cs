@@ -3,7 +3,6 @@
 //Purpose: This script controls the players movement
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -42,9 +41,15 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Vector3 lookAtPos = new Vector3(horizontalMove, 0, verticalMove);
         if (canMove)
         {
             rb.velocity = new Vector3(horizontalMove, rb.velocity.y, verticalMove).normalized * speed;
+            if (lookAtPos != Vector3.zero)
+            {
+                rb.rotation = Quaternion.LookRotation(lookAtPos);
+            }
+            
         }
     }
 }
