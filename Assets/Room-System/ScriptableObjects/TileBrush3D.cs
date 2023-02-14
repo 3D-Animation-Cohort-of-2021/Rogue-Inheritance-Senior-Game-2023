@@ -1,10 +1,14 @@
 //Created by: Marshall Krueger
 //Last edited by: Marshall Krueger 02/09/23
 //Purpose: A 3D Tile for our 3D tile system
+using UnityEngine.SceneManagement;
 using UnityEditor.Tilemaps;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
+namespace RoomTools.Brushes
+{
 
 [CreateAssetMenu(fileName = "New TileBrush3D", menuName = "3D/Tilemap/TileBrush3D", order = 0)]
 [CustomGridBrush(false, true, false, "TileBrush3D")]
@@ -16,6 +20,10 @@ public class TileBrush3D : GameObjectBrush
     public bool replaceTiles = false;
 
 
+    public BrushCell GetCurrentCell( )
+    {
+        return currentCell;
+    }
 
     public void SetCurrentCell(BrushCell newCell)
     {
@@ -152,6 +160,7 @@ public class TileBrush3D : GameObjectBrush
 
 
 #if UNITY_EDITOR
+
 [CustomEditor(typeof(TileBrush3D))]
 public class TileBrush3DEditor : Editor
     {
@@ -160,17 +169,22 @@ public class TileBrush3DEditor : Editor
         public override void OnInspectorGUI()
         {
             TileBrush3D tileBrush3DInstance = (TileBrush3D)target;
-            int nonNullIndex = 0;
-
-            GUILayout.Space(20);
-            tileBrush3DInstance.replaceTiles = GUILayout.Toggle(tileBrush3DInstance.replaceTiles,"Replace tiles with current brush.");
-            GUILayout.Space(20);
-
+            List<GameObjectBrush.BrushCell> validCells = new List<GameObjectBrush.BrushCell>(tileBrush3DInstance.cells);
+            GameObjectBrush.BrushCell currentCell = tileBrush3DInstance.GetCurrentCell();
             GUIStyle listStyle = new GUIStyle();
+            Color[] pixels;
+
+            foreach(GameObjectBrush.BrushCell cell in validCells)
+            {
+                if(cell.gameObject == null)
+                {
+                    validCells.Remove(cell);
+                }
+            }
 
             listStyle.normal.background = Texture2D.blackTexture;
 
-            Color[] pixels = listStyle.normal.background.GetPixels();
+            pixels = listStyle.normal.background.GetPixels();
 
             for(int i = 0; i < pixels.Length; i++)
             {
@@ -180,17 +194,31 @@ public class TileBrush3DEditor : Editor
             listStyle.normal.background.SetPixels(pixels);
             listStyle.normal.background.Apply();
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, listStyle, GUILayout.Width(EditorGUIUtility.currentViewWidth - 10), GUILayout.Height(300));
+            string currentCellName = "";
+            
+
+            if(currentCell != null && currentCell.gameObject != null)
+            {
+                currentCellName = currentCell.gameObject.name;
+            }
+
+            EditorGUILayout.PrefixLabel($"Selected Brush: {currentCellName.ToUpper()}");
+            EditorGUILayout.Space();
+            tileBrush3DInstance.replaceTiles = EditorGUILayout.ToggleLeft("Replace tiles with current brush.", tileBrush3DInstance.replaceTiles);
+            EditorGUILayout.Space();
+
+
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, listStyle, GUILayout.Width(EditorGUIUtility.currentViewWidth - 10), GUILayout.Height(300), GUILayout.ExpandWidth(true));
 
             
-            for(int i = 0; i < tileBrush3DInstance.cells.Length; i++)
+            for(int i = 0; i < validCells.Count; i++)
             {
                 int widthMod = 1;
                 if(tileBrush3DInstance.cells[i].gameObject != null)
                 {
                     
-                    Texture2D assetPreview = AssetPreview.GetAssetPreview(tileBrush3DInstance.cells[i].gameObject);
-                    GUIContent content = new GUIContent((assetPreview), tileBrush3DInstance.cells[i].gameObject.name);
+                    Texture2D assetPreview = AssetPreview.GetAssetPreview(validCells[i].gameObject);
+                    GUIContent content = new GUIContent((assetPreview), validCells[i].gameObject.name);
                     
 
                     if(assetPreview != null && (int)assetPreview.width > 0)
@@ -203,9 +231,9 @@ public class TileBrush3DEditor : Editor
                         widthMod = 1;
                     }
 
-                    if(nonNullIndex % widthMod == 0)
+                    if(i % widthMod == 0)
                     {
-                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.BeginHorizontal();
                     }
 
                     if(GUILayout.Button(content, GUILayout.Width(assetPreview != null ? assetPreview.width : 150)))
@@ -213,21 +241,16 @@ public class TileBrush3DEditor : Editor
                         tileBrush3DInstance.SetCurrentCell(tileBrush3DInstance.cells[i]);
                     }
 
-                    if(nonNullIndex % widthMod == widthMod - 1 || i == tileBrush3DInstance.cells.Length - 1 )
+                    if(i % widthMod == widthMod - 1 || i == validCells.Count - 1 )
                     {
-                        GUILayout.EndHorizontal();
+                        EditorGUILayout.EndHorizontal();
                     }
-
-                    nonNullIndex++;
-                }
-                else if(i != 0 && nonNullIndex != 0 && i == tileBrush3DInstance.cells.Length - 1 && (nonNullIndex % widthMod != 0 || widthMod == 1) )
-                {
-                    GUILayout.EndHorizontal();
                 }
             }
-            GUILayout.EndScrollView();
+            EditorGUILayout.EndScrollView();
 
             DrawDefaultInspector();
         }
     }
 #endif
+}

@@ -30,7 +30,6 @@ public class RoomPrefabBaker : MonoBehaviour
                 Transform child = transform.GetChild(i);
                 if(child.childCount != 0)
                 {
-
                     PrefabUtility.SaveAsPrefabAssetAndConnect(child.gameObject, folderPath + "/" + child.gameObject.name + ".prefab", InteractionMode.UserAction);
                     success = true;
                 }
@@ -39,12 +38,14 @@ public class RoomPrefabBaker : MonoBehaviour
             for(int i = transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = transform.GetChild(i);
-                Destroy(child);
+                DestroyImmediate(child.gameObject);
             }
 
         }
 
-        Instantiate(new GameObject(), transform);
+        GameObject temp = new GameObject();
+        temp.transform.parent = transform;
+        temp.name = "New Room";
 
         return success;
     }
@@ -72,7 +73,11 @@ public class RoomPrefabBakerEditor : Editor
         {
             RoomPrefabBaker roomPrefabBakerInstance = (RoomPrefabBaker)target;
 
-            GUILayout.BeginHorizontal();
+
+
+
+
+            EditorGUILayout.BeginHorizontal();
 
             roomPrefabBakerInstance.SetFolderPath(GUILayout.TextField(roomPrefabBakerInstance.GetFolderPath()));
 
@@ -86,9 +91,9 @@ public class RoomPrefabBakerEditor : Editor
                 roomPrefabBakerInstance.SetFolderPath(pathToCurrentFolder);
 
             }
-            GUILayout.EndHorizontal();
+            EditorGUILayout.EndHorizontal();
 
-            if(GUILayout.Button("Generate Prefab from Tilemaps", GUILayout.Height(50)))
+            if(GUILayout.Button("Generate Prefabs from Tilemaps", GUILayout.Height(50)))
             {
                 if(roomPrefabBakerInstance.GeneratePrefab())
                 {
