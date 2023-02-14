@@ -1,3 +1,7 @@
+//Created by: Marshall Krueger
+//Last edited by: marshall Krueger 02/13/2023
+//Purpose: This script generates a prefab from a newly made room layout
+
 using UnityEngine.Tilemaps;
 using UnityEngine;
 using UnityEditor;
@@ -9,6 +13,11 @@ public class RoomPrefabBaker : MonoBehaviour
 
     private string folderPath = "Assets";
 
+
+    /// <summary>
+    /// Purpose: Generate a prefab
+    /// </summary>
+    /// <returns>true on success</returns>
     public bool GeneratePrefab()
     {
         
@@ -50,11 +59,19 @@ public class RoomPrefabBaker : MonoBehaviour
         return success;
     }
 
+    /// <summary>
+    /// Purpose: set the current file path
+    /// </summary>
+    /// <param name="newFolderPath">a valid file path</param>
     public void SetFolderPath(string newFolderPath)
     {
         folderPath = newFolderPath;
     }
 
+    /// <summary>
+    /// Purpose: get the current file path
+    /// </summary>
+    /// <returns>the current file path</returns>
     public string GetFolderPath()
     {
         return folderPath;
@@ -69,13 +86,13 @@ public class RoomPrefabBaker : MonoBehaviour
 [CustomEditor(typeof(RoomPrefabBaker))]
 public class RoomPrefabBakerEditor : Editor
     {
+
+        /// <summary>
+        /// Purpose: Sets up the GUI for the prefab generator
+        /// </summary>
         public override void OnInspectorGUI()
         {
             RoomPrefabBaker roomPrefabBakerInstance = (RoomPrefabBaker)target;
-
-
-
-
 
             EditorGUILayout.BeginHorizontal();
 

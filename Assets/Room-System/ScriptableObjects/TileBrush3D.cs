@@ -1,6 +1,6 @@
 //Created by: Marshall Krueger
 //Last edited by: Marshall Krueger 02/09/23
-//Purpose: A 3D Tile for our 3D tile system
+//Purpose: A 3D Tile brush for our 3D tile system
 using UnityEngine.SceneManagement;
 using UnityEditor.Tilemaps;
 using System.Collections.Generic;
@@ -20,16 +20,30 @@ public class TileBrush3D : GameObjectBrush
     public bool replaceTiles = false;
 
 
+    /// <summary>
+    /// Purpose: Get the current brush cell
+    /// </summary>
+    /// <returns>the current brush cell</returns>
     public BrushCell GetCurrentCell( )
     {
         return currentCell;
     }
 
+    /// <summary>
+    /// Purpose: Set the current brush cell
+    /// </summary>
+    /// <param name="newCell">a valid brush cell</param>
     public void SetCurrentCell(BrushCell newCell)
     {
         currentCell = newCell;
     }
 
+    /// <summary>
+    /// Purpose: Erase tiles from the tilemap
+    /// </summary>
+    /// <param name="gridLayout">a valid grid or child of a grid</param>
+    /// <param name="brushTarget">the gameobject represented location in the grid</param>
+    /// <param name="position">the position in the grid</param>
     public override void Erase(GridLayout gridLayout, GameObject brushTarget, Vector3Int position)
     {
         if(brushTarget.layer == 31)
@@ -45,7 +59,12 @@ public class TileBrush3D : GameObjectBrush
     }
 
     
-
+    /// <summary>
+    /// Purpose: Begin the "paint" process
+    /// </summary>
+    /// <param name="gridLayout">a valid grid or child of a grid</param>
+    /// <param name="brushTarget">the gameobject represented location in the grid</param>
+    /// <param name="position">the position in the grid</param>
     public override void Paint(GridLayout gridLayout, GameObject brushTarget, Vector3Int position)
         {
             Vector3Int min = position - pivot;
@@ -54,6 +73,13 @@ public class TileBrush3D : GameObjectBrush
             BoxFill(gridLayout, brushTarget, bounds);
         }
 
+        /// <summary>
+        /// Purpose: Prepare tiles to be painted
+        /// </summary>
+        /// <param name="grid">a valid grid or child of a grid</param>
+        /// <param name="position">the position in the grid</param>
+        /// <param name="parent">parent object to the new tile</param>
+        /// <param name="cell">the active brush cell</param>
         private void PaintCell(GridLayout grid, Vector3Int position, Transform parent, BrushCell cell)
         {
             if (cell.gameObject == null)
@@ -72,6 +98,12 @@ public class TileBrush3D : GameObjectBrush
             }
         }
 
+        /// <summary>
+        /// Purpose: specify paint locations
+        /// </summary>
+        /// <param name="gridLayout">a valid grid or child of a grid</param>
+        /// <param name="brushTarget">the gameobject represented location in the grid</param>
+        /// <param name="position">the position in the grid</param>
         public override void BoxFill(GridLayout gridLayout, GameObject brushTarget, BoundsInt position)
         {
             GetGrid(ref gridLayout, ref brushTarget);
@@ -84,6 +116,17 @@ public class TileBrush3D : GameObjectBrush
             }
         }
 
+        /// <summary>
+        /// Purpose: paint tiles to tilemap
+        /// </summary>
+        /// <param name="grid">a valid grid or child of a grid</param>
+        /// <param name="parent">parent object to the new tile</param>
+        /// <param name="position">the position in the grid</param>
+        /// <param name="go">gameObject of the active brush cell</param>
+        /// <param name="offset">offset as specified in active brush cell</param>
+        /// <param name="scale">scale as specified in active brush cell</param>
+        /// <param name="orientation">orientation as specified in active brush cell</param>
+        /// <param name="anchor">anchor point specified in the brush</param>
         private static void SetSceneCell(GridLayout grid, Transform parent, Vector3Int position, GameObject go, Vector3 offset, Vector3 scale, Quaternion orientation, Vector3 anchor)
         {
             if (go == null)
@@ -123,7 +166,11 @@ public class TileBrush3D : GameObjectBrush
             instance.transform.localScale = scale;
             instance.transform.Translate(offset);
         }
-
+        
+        /// <summary>
+        /// Purpose: Get active grid
+        /// </summary>
+        /// <returns>the active grid</returns>
         private void GetGrid(ref GridLayout gridLayout, ref GameObject brushTarget)
         {
             if (brushTarget == hiddenGrid)
@@ -136,6 +183,12 @@ public class TileBrush3D : GameObjectBrush
             }
         }
 
+    /// <summary>
+    /// Purpose: Find any existing objects in a tile location
+    /// </summary>
+    /// <param name="gridLayout">a valid grid or child of a grid</param>
+    /// <param name="brushTarget">the gameobject represented location in the grid</param>
+    /// <param name="position">the position in the grid</param>
     private static Transform GetObjectInCell(GridLayout grid, Transform parent, Vector3Int position)
     {
         int childCount = parent.childCount;
@@ -166,6 +219,9 @@ public class TileBrush3DEditor : Editor
     {
         Vector2 scrollPosition = Vector2.zero;
 
+        /// <summary>
+        /// Purpose: Sets up the GUI for the TileBrush3D interface
+        /// </summary>
         public override void OnInspectorGUI()
         {
             TileBrush3D tileBrush3DInstance = (TileBrush3D)target;
