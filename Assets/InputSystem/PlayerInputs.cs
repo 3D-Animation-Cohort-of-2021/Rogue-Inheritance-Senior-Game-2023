@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputs : MonoBehaviour
 {
     public UnityEvent<Vector2> MoveInput;
-    public UnityEvent DashInput;
+    public UnityEvent DashInput, PrimaryEvent;
     public InputSO inputMap;
 
     private void Awake()
@@ -47,6 +47,10 @@ public class PlayerInputs : MonoBehaviour
         if (context.action.name == "Back" && context.started)
         {
             Debug.Log("Back");
+        }
+        if (context.action.name == "PrimaryAttack" && context.started)
+        {
+            PrimaryEvent.Invoke();
         }
         
     }
