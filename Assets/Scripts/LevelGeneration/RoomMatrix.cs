@@ -10,11 +10,13 @@ using Random = UnityEngine.Random;
 [CreateAssetMenu]
 public class RoomMatrix : ScriptableObject
 {
-  public GameObject occupiedRoom, endRoom, startRoom, emptySlot, hallway;
+  public GameObject emptySlot, hallway;
+  public AssetList occupiedRooms, endRooms, startRooms, specialRooms, hallways;
   private eRoom[,] grid = new eRoom[12, 12];
   public float layoutSpacing;
   private Vector3 placingVector;
-  List<int[]> possibleRooms = new List<int[]>();
+  private List<int[]> possibleRooms = new List<int[]>();
+  private List<float> roomWeights = new List<float>();
 
   public int GetGridSize(int dimension)
   {
@@ -22,8 +24,8 @@ public class RoomMatrix : ScriptableObject
       return 0;
     return grid.GetLength(dimension);
   }
-  
-/// <summary>
+
+  /// <summary>
 /// Fills the matrix with empty room values
 /// </summary>
   public void ClearFloor()
@@ -69,17 +71,22 @@ public class RoomMatrix : ScriptableObject
         {
           case eRoom.Occupied:
           {
-            Instantiate(occupiedRoom, placingVector, quaternion.identity);
+            Instantiate(occupiedRooms.GetRandomObject(), placingVector, quaternion.identity);
             break;
           }
           case eRoom.StartRoom:
           {
-            Instantiate(startRoom, placingVector, quaternion.identity);
+            Instantiate(startRooms.GetRandomObject(), placingVector, quaternion.identity);
             break;
           }
           case eRoom.EndRoom:
           {
-            Instantiate(endRoom, placingVector, quaternion.identity);
+            Instantiate(endRooms.GetRandomObject(), placingVector, quaternion.identity);
+            break;
+          }
+          case eRoom.SpecialRoom:
+          {
+            Instantiate(specialRooms.GetRandomObject(), placingVector, quaternion.identity);
             break;
           }
           case eRoom.Empty:
@@ -235,6 +242,20 @@ public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
     return currentFarthestCoordinate;
   }
 
+public void MarkSpecialRooms()
+{
+  int[] qCoord = new int[2];
+  for (int i = 0; i < grid.GetLength(0); i++)
+  {
+    qCoord[0] = i;
+    for (int j = 0; j < grid.GetLength(1); j++)
+    {
+      qCoord[1] = j;
+      if(IndexHasRoom(qCoord)&& OpenBuildSpots(qCoord)==3)
+        SetIndexValue(eRoom.SpecialRoom, qCoord);
+    }
+  }
+}
 /// <summary>
 /// Returns the number(int) available to build adjacent to the given coordinate.
 /// </summary>
@@ -259,7 +280,7 @@ public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
 /// </summary>
 /// <param name="coord"></param>
 /// <returns>Coordinate (int[])</returns>
-public int[] FindBestRoom(int[] coord)
+public int[] FindRandomRoom(int[] coord)
 {
   int[] queryCoord;
   possibleRooms.Clear();
@@ -275,7 +296,43 @@ public int[] FindBestRoom(int[] coord)
   //Debug.Log(chosenIndex+" of "+OpenBuildSpots(coord));
   return possibleRooms[chosenIndex];
 }
+public int[] FindBestRoom(int[] coord)
+{
+  int[] queryCoord;
+  float sumWeights =0f, currentFraction =0f, randomFrac;
+  possibleRooms.Clear();
+  roomWeights.Clear();
+  for (int i = 0; i < 4; i++)//adds possible rooms to list
+  {
+    queryCoord = GetAdjacentCoordinate(i, coord);
+    if (!CoordinateIsOutOfBounds(queryCoord) && !IndexHasRoom(queryCoord))
+    {
+      possibleRooms.Add(queryCoord);
+    }
+  }
+  foreach (int[] crd in possibleRooms)//Find the sum of the available weights
+  {
+    sumWeights += OpenBuildSpots(crd);
+  }
+  randomFrac = Random.Range(0, 1f);
+  for (int j = 0; j < possibleRooms.Count; j++)//create matching list for the room weights
+  {
+    roomWeights.Add(OpenBuildSpots(possibleRooms[j])/sumWeights);
+  }
+  //Debug.Log(string.Join(", ",roomWeights));
+  for (int k = 0; k < roomWeights.Count; k++)//find the random room
+  {
+    currentFraction += roomWeights[k];
+    //Debug.Log("Current sum frac at "+k+" is "+currentFraction);
+    if (currentFraction >= randomFrac)
+    {
+      return possibleRooms[k];
+    }
+  }
+
+  Debug.Log("did not find best room");
+  return possibleRooms[Random.Range(0, possibleRooms.Count)];
+}
 
 
-  
 }

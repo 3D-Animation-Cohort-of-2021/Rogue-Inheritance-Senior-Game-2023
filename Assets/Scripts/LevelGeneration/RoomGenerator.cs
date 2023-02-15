@@ -24,6 +24,8 @@ public class RoomGenerator : MonoBehaviour
         BuildFirstRoom();
         currentCoord = startCoord;
         BuildRooms(startCoord);
+        gridObject.MarkSpecialRooms();
+        gridObject.SetIndexValue(eRoom.StartRoom, startCoord);
         gridObject.SetIndexValue(eRoom.EndRoom, gridObject.FindFarthestFrom(startCoord));
         gridObject.LayoutFloor(buildEmptyRooms);
         gridObject.LayoutHallways();
@@ -43,7 +45,7 @@ public class RoomGenerator : MonoBehaviour
         {
             gridObject.SetIndexValue(eRoom.StartRoom, startCoord);
         }
-        Debug.Log("First room is"+ startCoord[0]+""+startCoord[1]);
+        Debug.Log("First room is"+ (startCoord[0] + 1)+""+ (startCoord[1] + 1));
     }
 /// <summary>
 /// Recursive Function: Decides if the current room will build and where to build it.
@@ -74,7 +76,7 @@ public class RoomGenerator : MonoBehaviour
             gridObject.SetIndexValue(eRoom.Occupied, newCoord);
             currentRoomCount++;
             currentCoord = newCoord;
-            Debug.Log(currentCoord[0]+" "+currentCoord[1]);
+            Debug.Log((currentCoord[0] + 1)+" "+ (currentCoord[1] + 1));
             BuildRooms(currentCoord);
         }
     }
