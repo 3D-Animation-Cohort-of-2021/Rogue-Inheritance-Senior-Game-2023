@@ -174,10 +174,10 @@ public class RoomMatrix : ScriptableObject
     return IndexHasRoom(GetAdjacentCoordinate(direction, coord));
   }
 
-public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
-{
-  return GetIndexValue(GetAdjacentCoordinate(direction, coord));
-}
+  public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
+  {
+    return GetIndexValue(GetAdjacentCoordinate(direction, coord));
+  }
 /// <summary>
 /// Returns whether or not the requested coordinate adjacent in (x) direction is out of the matrix bounds
 /// </summary>
@@ -241,21 +241,23 @@ public eRoom GetAdjacentRoomStatus(int direction, int[] coord)
       }
     return currentFarthestCoordinate;
   }
-
-public void MarkSpecialRooms()
-{
-  int[] qCoord = new int[2];
-  for (int i = 0; i < grid.GetLength(0); i++)
+/// <summary>
+/// Finds rooms with only one entrance and marks them as specialRoom eRooms
+/// </summary>
+  public void MarkSpecialRooms()
   {
-    qCoord[0] = i;
-    for (int j = 0; j < grid.GetLength(1); j++)
+    int[] qCoord = new int[2];
+    for (int i = 0; i < grid.GetLength(0); i++)
     {
-      qCoord[1] = j;
-      if(IndexHasRoom(qCoord)&& OpenBuildSpots(qCoord)==3)
-        SetIndexValue(eRoom.SpecialRoom, qCoord);
+      qCoord[0] = i;
+      for (int j = 0; j < grid.GetLength(1); j++)
+      {
+        qCoord[1] = j;
+        if(IndexHasRoom(qCoord)&& OpenBuildSpots(qCoord)==3)
+          SetIndexValue(eRoom.SpecialRoom, qCoord);
+      }
     }
   }
-}
 /// <summary>
 /// Returns the number(int) available to build adjacent to the given coordinate.
 /// </summary>
@@ -280,59 +282,65 @@ public void MarkSpecialRooms()
 /// </summary>
 /// <param name="coord"></param>
 /// <returns>Coordinate (int[])</returns>
-public int[] FindRandomRoom(int[] coord)
-{
-  int[] queryCoord;
-  possibleRooms.Clear();
-  for (int i = 0; i < 4; i++)
+  public int[] FindRandomRoom(int[] coord)
   {
-    queryCoord = GetAdjacentCoordinate(i, coord);
-    if (!CoordinateIsOutOfBounds(queryCoord) && !IndexHasRoom(queryCoord))
+    int[] queryCoord;
+    possibleRooms.Clear();
+    for (int i = 0; i < 4; i++)
     {
-      possibleRooms.Add(queryCoord);
+      queryCoord = GetAdjacentCoordinate(i, coord);
+      if (!CoordinateIsOutOfBounds(queryCoord) && !IndexHasRoom(queryCoord))
+      {
+        possibleRooms.Add(queryCoord);
+      }
     }
+    int chosenIndex = Random.Range(0, possibleRooms.Count - 1);
+    //Debug.Log(chosenIndex+" of "+OpenBuildSpots(coord));
+    return possibleRooms[chosenIndex];
   }
-  int chosenIndex = Random.Range(0, possibleRooms.Count - 1);
-  //Debug.Log(chosenIndex+" of "+OpenBuildSpots(coord));
-  return possibleRooms[chosenIndex];
-}
-public int[] FindBestRoom(int[] coord)
-{
-  int[] queryCoord;
-  float sumWeights =0f, currentFraction =0f, randomFrac;
-  possibleRooms.Clear();
-  roomWeights.Clear();
-  for (int i = 0; i < 4; i++)//adds possible rooms to list
+/// <summary>
+/// Weighs each available room that can be built from the given coordinate, and chooses randomly, with the chance of a
+/// given room being chosen affected by how many rooms are adjacent to said room
+/// TLDR: Is more likely to choose a room not surrounded by other rooms
+/// </summary>
+/// <param name="coord"></param>
+/// <returns></returns>
+  public int[] FindBestRoom(int[] coord)
   {
-    queryCoord = GetAdjacentCoordinate(i, coord);
-    if (!CoordinateIsOutOfBounds(queryCoord) && !IndexHasRoom(queryCoord))
+    int[] queryCoord;
+    float sumWeights =0f, currentFraction =0f, randomFrac;
+    possibleRooms.Clear();
+    roomWeights.Clear();
+    for (int i = 0; i < 4; i++)//adds possible rooms to list
     {
-      possibleRooms.Add(queryCoord);
+      queryCoord = GetAdjacentCoordinate(i, coord);
+      if (!CoordinateIsOutOfBounds(queryCoord) && !IndexHasRoom(queryCoord))
+      {
+        possibleRooms.Add(queryCoord);
+      }
     }
-  }
-  foreach (int[] crd in possibleRooms)//Find the sum of the available weights
-  {
-    sumWeights += OpenBuildSpots(crd);
-  }
-  randomFrac = Random.Range(0, 1f);
-  for (int j = 0; j < possibleRooms.Count; j++)//create matching list for the room weights
-  {
-    roomWeights.Add(OpenBuildSpots(possibleRooms[j])/sumWeights);
-  }
-  //Debug.Log(string.Join(", ",roomWeights));
-  for (int k = 0; k < roomWeights.Count; k++)//find the random room
-  {
-    currentFraction += roomWeights[k];
-    //Debug.Log("Current sum frac at "+k+" is "+currentFraction);
-    if (currentFraction >= randomFrac)
+    foreach (int[] crd in possibleRooms)//Find the sum of the available weights
     {
-      return possibleRooms[k];
+      sumWeights += OpenBuildSpots(crd);
     }
+    randomFrac = Random.Range(0, 1f);
+    for (int j = 0; j < possibleRooms.Count; j++)//create matching list for the room weights
+    {
+      roomWeights.Add(OpenBuildSpots(possibleRooms[j])/sumWeights);
+    }
+    //Debug.Log(string.Join(", ",roomWeights));
+    for (int k = 0; k < roomWeights.Count; k++)//find the random room
+    {
+      currentFraction += roomWeights[k];
+      //Debug.Log("Current sum frac at "+k+" is "+currentFraction);
+      if (currentFraction >= randomFrac)
+      {
+        return possibleRooms[k];
+      }
+    }
+    Debug.Log("did not find best room");
+    return possibleRooms[Random.Range(0, possibleRooms.Count)];
   }
-
-  Debug.Log("did not find best room");
-  return possibleRooms[Random.Range(0, possibleRooms.Count)];
-}
 
 
 }

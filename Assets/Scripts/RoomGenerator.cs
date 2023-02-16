@@ -80,20 +80,5 @@ public class RoomGenerator : MonoBehaviour
             BuildRooms(currentCoord);
         }
     }
-/// <summary>
-/// REDUNDANT-USE MATRIX.FINDBESTROOM INSTEAD-: takes the current coordinate and returns the new coordinate to build in.
-/// </summary>
-/// <param name="thisCurrentCoord">The current coordinate</param>
-/// <returns>The new coordinate that was chosen</returns>
-    private int[] PickRoom(int[] thisCurrentCoord)
-    {
-        int[] thisNewCoord = gridObject.GetAdjacentCoordinate(Random.Range(0, 4), thisCurrentCoord);
-        if (gridObject.CoordinateIsOutOfBounds(thisNewCoord) || gridObject.IndexHasRoom(thisNewCoord))
-        {
-            thisNewCoord = PickRoom(thisCurrentCoord);
-        }
-        //Debug.Log(thisNewCoord[0]+" "+thisNewCoord[1]);
-        return thisNewCoord;
-    }
 
 }
