@@ -19,5 +19,5 @@ MonoBehaviour:
   endRooms: {fileID: 11400000, guid: 1ca05bf7d03938d4a85289b8c6cb259d, type: 2}
   startRooms: {fileID: 11400000, guid: 15eec14752cbd914a83810205109a1d2, type: 2}
   specialRooms: {fileID: 11400000, guid: 8452a2de39aa8f34eabce2219c6f8fff, type: 2}
-  hallways: {fileID: 0}
+  hallways: {fileID: 11400000, guid: a9a621b14f7542e4ebbba586c8212026, type: 2}
   layoutSpacing: 2

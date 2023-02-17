@@ -24,6 +24,7 @@ public class RoomGenerator : MonoBehaviour
         BuildFirstRoom();
         currentCoord = startCoord;
         BuildRooms(startCoord);
+        currentRoomCount -= gridObject.PunchOutClumps();
         gridObject.MarkSpecialRooms();
         gridObject.SetIndexValue(eRoom.StartRoom, startCoord);
         gridObject.SetIndexValue(eRoom.EndRoom, gridObject.FindFarthestFrom(startCoord));

@@ -162,6 +162,37 @@ public class RoomMatrix : ScriptableObject
   }
   return coord == null ? null : adjCoord;
   }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="direction"></param>
+/// <param name="coord"></param>
+/// <returns></returns>
+public int[] GetDiagonalCoordinate(int direction, int[] coord)
+{
+  if (direction>3)
+    Debug.Log("Invalid direction "+direction);
+  int[] adjCoord = new int[] { };
+  switch (direction)
+  {
+    case 0://up right
+      adjCoord = new int[] {coord[0] + 1, coord[1] + 1};
+      break;
+    case 1://down right
+      adjCoord = new int[] {coord[0] + 1, coord[1] - 1};
+      break;
+    case 2://down left
+      adjCoord = new int[] {coord[0] - 1, coord[1] - 1};
+      break;
+    case 3://up left
+      adjCoord = new int[] {coord[0] - 1, coord[1] + 1};
+      break;
+    default:
+      coord = null;
+      break;
+  }
+  return coord == null ? null : adjCoord;
+}
 
 /// <summary>
 /// Returns the current status of the adjacent coordinate in given direction
@@ -276,7 +307,44 @@ public class RoomMatrix : ScriptableObject
       }
     }
     return spots;
-}
+  }
+  public int OpenDiagonalSpots(int[] coord)
+  {
+    int spots = 0;
+    int[] adjCoord;
+    for (int i = 0; i < 4; i++)
+    {
+      adjCoord = GetDiagonalCoordinate(i, coord);
+      if (!CoordinateIsOutOfBounds(adjCoord) && !IndexHasRoom(adjCoord))
+      {
+        spots += 1;
+      }
+    }
+    return spots;
+  }
+
+  public int TotalSurroundingNeighbors(int[] coord)
+  {
+    int nbrs = 0;
+    int[] adjCoord;
+    for (int i = 0; i < 4; i++)
+    {
+      adjCoord = GetDiagonalCoordinate(i, coord);
+      if (!CoordinateIsOutOfBounds(adjCoord) && IndexHasRoom(adjCoord))
+      {
+        nbrs += 1;
+      }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+      adjCoord = GetAdjacentCoordinate(i, coord);
+      if (!CoordinateIsOutOfBounds(adjCoord) && IndexHasRoom(adjCoord))
+      {
+        nbrs += 1;
+      }
+    }
+    return nbrs;
+  }
 /// <summary>
 /// Picks randomly from available rooms without using recursion
 /// </summary>
@@ -326,9 +394,9 @@ public class RoomMatrix : ScriptableObject
     randomFrac = Random.Range(0, 1f);
     for (int j = 0; j < possibleRooms.Count; j++)//create matching list for the room weights
     {
-      roomWeights.Add(OpenBuildSpots(possibleRooms[j])/sumWeights);
+      roomWeights.Add((OpenBuildSpots(possibleRooms[j]))/sumWeights);
     }
-    //Debug.Log(string.Join(", ",roomWeights));
+    Debug.Log(string.Join(", ",roomWeights));
     for (int k = 0; k < roomWeights.Count; k++)//find the random room
     {
       currentFraction += roomWeights[k];
@@ -342,5 +410,25 @@ public class RoomMatrix : ScriptableObject
     return possibleRooms[Random.Range(0, possibleRooms.Count)];
   }
 
+public int PunchOutClumps()
+{
+  int removed = 0;
+  int[] qCoord = new int [2];
+  for (int i = 0; i < grid.GetLength(0); i++)
+  {
+    qCoord[0] = i;
+    for (int j = 0; j < grid.GetLength(1); j++)
+    {
+      qCoord[1] = j;
+      if (TotalSurroundingNeighbors(qCoord)==7)
+      {
+        SetIndexValue(eRoom.Empty, qCoord);
+        Debug.Log("Punched out"+qCoord[0]+" "+qCoord[1]);
+        removed++;
+      }
+    }
+  }
+  return removed;
+}
 
 }
