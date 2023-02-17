@@ -4,5 +4,12 @@ public enum eRoom
     Occupied,
     SpecialRoom,
     StartRoom,
-    EndRoom,
+    EndRoom
+}
+public enum exRoom
+{
+    StartRoom,
+    Room,
+    SpecialRoom,
+    EndRoom
 }
