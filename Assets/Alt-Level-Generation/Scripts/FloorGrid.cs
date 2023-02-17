@@ -75,9 +75,22 @@ public class FloorGrid
         return floorRooms[xCoord, zCoord];
     }
 
-    public void FillRoom(int xCoord, int zCoord)
+    public void FillRoom(int xCoord, int zCoord, GameObject gameObject)
     {
-        floorRooms[xCoord, zCoord].OccupyRoom();
+        floorRooms[xCoord, zCoord].OccupyRoom(gameObject);
+    }
+
+    public Vector2Int SelectRoomByRandom()
+    {
+        int randX = Random.Range(0, floorRooms.GetLength(0));
+        int randZ = Random.Range(0, floorRooms.GetLength(1));
+
+        if(!floorRooms[randX, randZ].IsOccupied)
+        {
+            return new Vector2Int(randX, randZ);
+        }
+
+        return new Vector2Int(-1, -1);
     }
 
     

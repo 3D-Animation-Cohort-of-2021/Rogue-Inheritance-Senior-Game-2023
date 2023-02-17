@@ -5,6 +5,7 @@ using UnityEngine;
 public class AltFloorGenerator : MonoBehaviour
 {
     public Vector2Int floorGridSize;
+    public RoomSetSO roomSet;
 
     private FloorGrid floorGrid;
     // Start is called before the first frame update
@@ -15,11 +16,22 @@ public class AltFloorGenerator : MonoBehaviour
 
     private void GenerateFloor()
     {
-        CreateStartingRoom();
+        ChooseStartingRoom();
     }
 
-    private void CreateStartingRoom()
+    private void ChooseStartingRoom()
     {
 
     }
+
+    private void ChooseRoom()
+    {
+
+    }
+
+    private void ChooseEndRoom()
+    {
+
+    }
+
 }

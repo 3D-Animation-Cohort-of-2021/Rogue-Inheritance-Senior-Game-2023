@@ -30,7 +30,7 @@ public class RoomData
         return false;
     }
 
-    public bool OccupyRoom()
+    public bool OccupyRoom(GameObject gameObject)
     {
         occupied = true;
         weight = 0;
