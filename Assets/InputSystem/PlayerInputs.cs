@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputs : MonoBehaviour
 {
-    public UnityEvent<Vector2> MoveInput;
+    public UnityEvent<Vector2> MoveInput, LookInput;
     public UnityEvent DashInput, PrimaryEvent;
     public InputSO inputMap;
 
@@ -34,7 +34,7 @@ public class PlayerInputs : MonoBehaviour
         }
         if (context.action.name == "Look")
         {
-            Debug.Log("Looking");
+            LookInput.Invoke(context.ReadValue<Vector2>());
         }
         if (context.action.name == "Dash" && context.started)
         {

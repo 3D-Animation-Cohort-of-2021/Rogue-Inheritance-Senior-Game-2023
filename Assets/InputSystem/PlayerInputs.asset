@@ -26,8 +26,8 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     - m_Name: Look
-      m_Type: 1
-      m_ExpectedControlType: Button
+      m_Type: 2
+      m_ExpectedControlType: Vector2
       m_Id: 6c3b36ea-2524-4812-adf1-16a736aa16fd
       m_Processors: 
       m_Interactions: 
@@ -90,54 +90,22 @@ MonoBehaviour:
       m_Groups: 
       m_Action: Back
       m_Flags: 0
-    - m_Name: Vertical
-      m_Id: 4c9b0e16-039a-4d56-b806-7d5bb9098e5d
-      m_Path: 1DAxis
+    - m_Name: 
+      m_Id: 37d070c2-818f-4b66-aa5c-2a47f146334a
+      m_Path: <Mouse>/position
       m_Interactions: 
       m_Processors: 
       m_Groups: 
       m_Action: Look
-      m_Flags: 4
-    - m_Name: negative
-      m_Id: 382867a8-e71f-410e-bb9b-33f2c7025462
-      m_Path: <Gamepad>/rightStick/down
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 647357b3-fe4e-4d15-a326-625b0737480e
+      m_Path: <Gamepad>/rightStick
       m_Interactions: 
       m_Processors: 
       m_Groups: 
       m_Action: Look
-      m_Flags: 8
-    - m_Name: positive
-      m_Id: 1915f9c5-fc5f-4e86-b67e-5c470bbe8fea
-      m_Path: <Gamepad>/rightStick/up
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Look
-      m_Flags: 8
-    - m_Name: Horizontal
-      m_Id: 260b20e3-5e83-4a40-a4da-871bf99bad31
-      m_Path: 1DAxis
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Look
-      m_Flags: 4
-    - m_Name: negative
-      m_Id: a7bf490d-cedf-4f01-9a10-74b3dad3b58e
-      m_Path: <Gamepad>/rightStick/left
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Look
-      m_Flags: 8
-    - m_Name: positive
-      m_Id: 6450e363-e53c-4924-a5c8-2f729d791cae
-      m_Path: <Gamepad>/rightStick/right
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Look
-      m_Flags: 8
+      m_Flags: 0
     - m_Name: Axis
       m_Id: 8104faf0-4ab6-4ca8-b6f1-63efbbf244ac
       m_Path: 2DVector
