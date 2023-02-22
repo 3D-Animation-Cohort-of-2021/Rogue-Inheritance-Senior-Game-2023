@@ -7,8 +7,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputs : MonoBehaviour
 {
-    public UnityEvent<Vector2> MoveInput, LookInput;
-    public UnityEvent DashInput, PrimaryEvent;
+    public UnityEvent<Vector2> MoveInput, LookInput, MouseInput;
+    public UnityEvent DashInput, PrimaryEvent, SecondaryEvent;
     public InputSO inputMap;
 
     private void Awake()
@@ -36,7 +36,11 @@ public class PlayerInputs : MonoBehaviour
         {
             LookInput.Invoke(context.ReadValue<Vector2>());
         }
-        if (context.action.name == "Dash" && context.started)
+        if (context.action.name == "MouseLook")
+        {
+            MouseInput.Invoke(context.ReadValue<Vector2>());
+        }
+        if (context.action.name == "Dash" && context.performed)
         {
             DashInput.Invoke();
         }
@@ -48,9 +52,13 @@ public class PlayerInputs : MonoBehaviour
         {
             Debug.Log("Back");
         }
-        if (context.action.name == "PrimaryAttack" && context.started)
+        if (context.action.name == "PrimaryAttack" && context.performed)
         {
             PrimaryEvent.Invoke();
+        }
+        if (context.action.name == "SecondaryAttack" && context.performed)
+        {
+            SecondaryEvent.Invoke();
         }
         
     }
