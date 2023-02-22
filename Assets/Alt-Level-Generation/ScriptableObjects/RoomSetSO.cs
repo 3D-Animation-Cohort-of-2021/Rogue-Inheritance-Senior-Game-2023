@@ -2,17 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RoomSetSO : MonoBehaviour
+[CreateAssetMenu(fileName = "RoomSet", menuName = "ScriptableObjects/LevelGenerator/RoomSet", order = 1)]
+public class RoomSetSO : ScriptableObject
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public AssetList startRooms;
+    public AssetList rooms;
+    public AssetList endRooms;
 }

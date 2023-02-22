@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -8,12 +9,18 @@ public class RoomData
     private Vector2Int gridCoordinate;
     private bool occupied = false;
     private Neighbors neighbors;
-    private int weight;
+    private int weight = 0;
     private exRoom roomType = exRoom.Room;
     private GameObject roomObject;
 
+
+    public Vector2Int GridCoordinate
+    {
+        get { return gridCoordinate; }
+    }
     public bool IsOccupied { get { return occupied; } }
     public int Weight { get { return weight; } }
+    public exRoom RoomType { get { return roomType; } }
 
     public RoomData(int xCoord, int zCoord)
     {
@@ -34,7 +41,7 @@ public class RoomData
     {
         occupied = true;
         weight = 0;
-
+        roomObject = GameObject.Instantiate(gameObject, new Vector3((float)gridCoordinate.x, 0f, (float)gridCoordinate.y), Quaternion.identity);
         UpdateNeighbors();
 
 
@@ -47,9 +54,9 @@ public class RoomData
     {
         int occupiedNeighbors = neighbors.GetNumberOfOccupiedNeighbors();
 
-        if(occupiedNeighbors > 0)
+        if(occupiedNeighbors > 0 && !occupied)
         {
-            weight = 4 - occupiedNeighbors;
+            weight = (int)Mathf.Pow(4 - (float)occupiedNeighbors, 2);
             return true;
         }
         else

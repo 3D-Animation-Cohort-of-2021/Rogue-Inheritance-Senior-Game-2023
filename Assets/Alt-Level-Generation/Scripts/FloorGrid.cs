@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -80,6 +79,24 @@ public class FloorGrid
         floorRooms[xCoord, zCoord].OccupyRoom(gameObject);
     }
 
+    private List<RoomData> GetWeightedRooms()
+    {
+        List<RoomData> weightedRooms = new List<RoomData>();
+
+        for (int i = 0; i < floorRooms.GetLength(0); i++)
+        {
+            for (int j = 0; j < floorRooms.GetLength(1); j++)
+            {
+                if (floorRooms[i, j].Weight > 0)
+                {
+                    weightedRooms.Add(floorRooms[i, j]);
+                }
+            }
+        }
+
+        return weightedRooms;
+    }
+
     public Vector2Int SelectRoomByRandom()
     {
         int randX = Random.Range(0, floorRooms.GetLength(0));
@@ -91,6 +108,37 @@ public class FloorGrid
         }
 
         return new Vector2Int(-1, -1);
+    }
+
+    public Vector2Int SelectRoomByWeight()
+    {
+        float floorWeight = 0;
+        float currentWeight = 0;
+        float rand = Random.Range(0, 1.0f);
+
+        List<RoomData> weightedRooms = GetWeightedRooms();
+        for(int i = 0; i < weightedRooms.Count; i++)
+        {
+            floorWeight += (float)weightedRooms[i].Weight;
+        }
+
+
+        Debug.Log($"Weighted Rooms: {weightedRooms.Count} Floor Weight: {floorWeight}");
+        Debug.Log(rand);
+
+        for (int i = 0; i < weightedRooms.Count; i++)
+        {
+            currentWeight += (float)weightedRooms[i].Weight;
+
+            Debug.Log(currentWeight);
+            if (currentWeight/floorWeight >= rand)
+            {
+                return weightedRooms[i].GridCoordinate;
+            }
+         }
+
+        return new Vector2Int(-1, -1);
+
     }
 
     
