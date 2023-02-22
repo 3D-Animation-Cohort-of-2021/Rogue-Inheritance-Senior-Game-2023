@@ -37,11 +37,11 @@ public class RoomData
         return false;
     }
 
-    public bool OccupyRoom(GameObject gameObject)
+    public bool OccupyRoom(GameObject gameObject, float roomSpacing)
     {
         occupied = true;
         weight = 0;
-        roomObject = GameObject.Instantiate(gameObject, new Vector3((float)gridCoordinate.x, 0f, (float)gridCoordinate.y), Quaternion.identity);
+        roomObject = GameObject.Instantiate(gameObject, new Vector3((float)gridCoordinate.x * roomSpacing, 0f, (float)gridCoordinate.y * roomSpacing), Quaternion.identity);
         UpdateNeighbors();
 
 
@@ -78,6 +78,15 @@ public class RoomData
             }
         }
 
+        return false;
+    }
+
+    public bool CheckForNeighbor(int index)
+    {
+        if(occupied && neighbors.GetNeighborByIndex(index) != null && neighbors.GetNeighborByIndex(index).IsOccupied)
+        {
+            return true;
+        }
         return false;
     }
 

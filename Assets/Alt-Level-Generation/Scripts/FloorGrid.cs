@@ -74,9 +74,9 @@ public class FloorGrid
         return floorRooms[xCoord, zCoord];
     }
 
-    public void FillRoom(int xCoord, int zCoord, GameObject gameObject)
+    public void FillRoom(int xCoord, int zCoord, GameObject gameObject, float roomSpacing)
     {
-        floorRooms[xCoord, zCoord].OccupyRoom(gameObject);
+        floorRooms[xCoord, zCoord].OccupyRoom(gameObject, roomSpacing);
     }
 
     private List<RoomData> GetWeightedRooms()
@@ -141,5 +141,9 @@ public class FloorGrid
 
     }
 
+    public bool CheckForTileNeighbor(int xCoord, int zCoord, int index)
+    {
+        return floorRooms[xCoord, zCoord].CheckForNeighbor(index);
+    }
     
 }

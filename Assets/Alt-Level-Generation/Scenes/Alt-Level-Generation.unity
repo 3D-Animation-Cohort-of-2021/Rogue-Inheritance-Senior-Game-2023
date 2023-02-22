@@ -253,7 +253,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorGridSize: {x: 20, y: 20}
   maxRooms: 25
+  roomSpacing: 2
   roomSet: {fileID: 11400000, guid: c36a0083be1ff7d40bfdfb4767940091, type: 2}
+  hallPrefab: {fileID: 1114433575978653121, guid: 4413f1df7c9155c40942bc9308b6b95a,
+    type: 3}
 --- !u!1 &1305511150
 GameObject:
   m_ObjectHideFlags: 0
