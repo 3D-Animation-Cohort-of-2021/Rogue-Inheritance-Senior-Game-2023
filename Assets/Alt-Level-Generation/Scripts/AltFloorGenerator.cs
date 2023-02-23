@@ -25,6 +25,7 @@ public class AltFloorGenerator : MonoBehaviour
         ChooseStartingRoom();
         ChooseRoom();
         MakeHalls();
+        ChooseEndRoom();
     }
 
     private void ChooseStartingRoom()
@@ -33,8 +34,10 @@ public class AltFloorGenerator : MonoBehaviour
 
         if (startCoord.x != -1 && startCoord.y != -1)
         {
-            floorGrid.FillRoom(startCoord.x, startCoord.y, roomSet.startRooms.GetRandomObject(), roomSpacing);
+            floorGrid.FillRoom(startCoord.x, startCoord.y, exRoom.StartRoom, roomSet.startRooms.GetRandomObject(), roomSpacing);
             numRooms++;
+
+            floorGrid.UpdateWeightedRooms(startCoord);
         }
         
     }
@@ -45,9 +48,11 @@ public class AltFloorGenerator : MonoBehaviour
 
         if (roomCoord.x != -1 && roomCoord.y != -1)
         {
-            floorGrid.FillRoom(roomCoord.x, roomCoord.y, roomSet.rooms.GetRandomObject(), roomSpacing);
+            floorGrid.FillRoom(roomCoord.x, roomCoord.y, exRoom.Room, roomSet.rooms.GetRandomObject(), roomSpacing);
 
             numRooms++;
+
+            floorGrid.UpdateWeightedRooms(roomCoord);
 
             if (numRooms < maxRooms)
             {
@@ -58,7 +63,8 @@ public class AltFloorGenerator : MonoBehaviour
 
     private void ChooseEndRoom()
     {
-
+        Vector2Int endCoord = floorGrid.SelectEndRoomByRandom();
+        floorGrid.ReplaceRoom(endCoord, roomSet.endRooms.GetRandomObject(), exRoom.EndRoom);
     }
 
     private void MakeHalls()
@@ -70,12 +76,12 @@ public class AltFloorGenerator : MonoBehaviour
 
                 if(floorGrid.CheckForTileNeighbor(i, j, 1))
                 {
-                    Instantiate(hallPrefab, new Vector3(i * roomSpacing, 0, (j * roomSpacing) + (roomSpacing / 2)), Quaternion.Euler(new Vector3(90, 0, 0)));
+                    Instantiate(hallPrefab, new Vector3(i * roomSpacing - ((float)floorGridSize.x / 2f), 0, (j * roomSpacing) + (roomSpacing / 2) - ((float)floorGridSize.y / 2f)), Quaternion.Euler(new Vector3(90, 0, 0)));
                 }
 
                 if (floorGrid.CheckForTileNeighbor(i, j, 3))
                 {
-                    Instantiate(hallPrefab, new Vector3((i * roomSpacing) + (roomSpacing / 2), 0, j * roomSpacing), Quaternion.Euler(new Vector3(0, 0, 90)));
+                    Instantiate(hallPrefab, new Vector3((i * roomSpacing) + (roomSpacing / 2) - ((float)floorGridSize.x / 2f), 0, j * roomSpacing - ((float)floorGridSize.y / 2f)), Quaternion.Euler(new Vector3(0, 0, 90)));
                 }
 
             }

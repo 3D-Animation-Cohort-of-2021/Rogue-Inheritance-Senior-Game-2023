@@ -30,21 +30,30 @@ public class RoomData
         gridCoordinate = new Vector2Int(xCoord, zCoord);
     }
 
-    public bool SetNeighbors(RoomData north, RoomData south, RoomData east, RoomData west)
+    public bool SetNeighbors(RoomData north, RoomData south, RoomData east, RoomData west, RoomData northWest, RoomData northEast, RoomData southWest, RoomData southEast)
     {
-        neighbors.SetNeighbors(north, south, east, west);
+        neighbors.SetNeighbors(north, south, east, west, northWest, northEast, southWest, southEast);
 
         return false;
     }
 
-    public bool OccupyRoom(GameObject gameObject, float roomSpacing)
+    public bool OccupyRoom(GameObject gameObject, exRoom roomType, float roomSpacing, float floorX, float floorZ)
     {
+        this.roomType = roomType;
         occupied = true;
         weight = 0;
-        roomObject = GameObject.Instantiate(gameObject, new Vector3((float)gridCoordinate.x * roomSpacing, 0f, (float)gridCoordinate.y * roomSpacing), Quaternion.identity);
+        roomObject = GameObject.Instantiate(gameObject, new Vector3(((float)gridCoordinate.x * roomSpacing) - (floorX / 2f), 0f, (float)gridCoordinate.y * roomSpacing - (floorZ / 2f)), Quaternion.identity);
         UpdateNeighbors();
 
 
+        return false;
+    }
+
+    public bool SwapRoom(GameObject newGameObject, exRoom roomType)
+    {
+        GameObject temp = roomObject;
+        roomObject = GameObject.Instantiate(newGameObject, temp.transform.position, temp.transform.rotation);
+        GameObject.Destroy(temp);
         return false;
     }
 
@@ -56,7 +65,7 @@ public class RoomData
 
         if(occupiedNeighbors > 0 && !occupied)
         {
-            weight = (int)Mathf.Pow(4 - (float)occupiedNeighbors, 2);
+            weight = (int)Mathf.Pow(neighbors.size - (float)Mathf.Clamp((occupiedNeighbors), 0, neighbors.size), 2);
             return true;
         }
         else
@@ -70,7 +79,7 @@ public class RoomData
 
     public bool UpdateNeighbors()
     {
-        for(int i = 0; i < neighbors.size; i++)
+        for(int i = 0; i < neighbors.size / 2; i++)
         {
             if (neighbors.GetNeighborByIndex(i) != null)
             {
@@ -90,6 +99,21 @@ public class RoomData
         return false;
     }
 
+    public RoomData GetNeighbor(int index)
+    {
+        return neighbors.GetNeighborByIndex(index);
+    }
+
+    public int GetNumNeighbors()
+    {
+        return neighbors.size;
+    }
+
+    public int GetNumOccupiedNeighbors()
+    {
+        return neighbors.GetNumberOfOccupiedNeighbors();
+    }
+
 
 }
 
@@ -99,16 +123,24 @@ public struct Neighbors
     private RoomData south;
     private RoomData east;
     private RoomData west;
+    private RoomData northWest;
+    private RoomData southEast;
+    private RoomData northEast;
+    private RoomData southWest;
     public int size;
 
-    public bool SetNeighbors(RoomData north, RoomData south, RoomData east, RoomData west)
+    public bool SetNeighbors(RoomData north, RoomData south, RoomData east, RoomData west, RoomData northWest, RoomData northEast, RoomData southWest, RoomData southEast)
     {
         this.north = north;
         this.south = south;
         this.east = east;
         this.west = west;
+        this.northEast = northEast;
+        this.northWest = northWest;
+        this.southEast = southEast;
+        this.southWest = southWest;
 
-        size = 4;
+        size = 8;
 
         return false;
     }
@@ -136,6 +168,10 @@ public struct Neighbors
             case 1: return south;
             case 2: return east;
             case 3: return west;
+            case 4: return northEast;
+            case 5: return northWest;
+            case 6: return southEast;
+            case 7: return southWest;
             default: return null;
         }
     }
