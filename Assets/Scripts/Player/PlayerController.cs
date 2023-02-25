@@ -10,7 +10,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Camera cam;
-    private Vector2 direction,move,look;
+    [SerializeField] private LayerMask mouseLayer;
+    private Vector2 move;
+    private Vector3 look, direction;
     private float speed = 8f;
     private Rigidbody rb;
     private bool canMove = true;
@@ -31,18 +33,21 @@ public class PlayerController : MonoBehaviour
     public void SetLookAxis(Vector2 axis)
     {
         look = axis;
-       // Mouse = false;
+        Mouse = false;
     }
     
     public void SetMouseLookAxis(Vector2 axis)
     {
-        //var ray = cam.ScreenPointToRay(axis);
-        //if (Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, default))
-        //{
-            //look = hitInfo.point;
-        //}
-        look = axis;
-        //Mouse = true;
+        //Vector3 mousepos = axis;
+        //mousepos.z = 100f;
+        //mousepos = cam.ScreenToWorldPoint(mousepos);
+        Ray ray = cam.ScreenPointToRay(axis);
+        //Debug.DrawRay(cam.transform.position, mousepos-transform.position, Color.red);
+        if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, mouseLayer))
+        {
+            look = hit.point;
+        }
+        Mouse = true;
     }
     private IEnumerator Wait(float num)
     {
@@ -73,14 +78,14 @@ public class PlayerController : MonoBehaviour
         }
         if (lookAtPos != Vector3.zero)
         {
-            /*
+            
             if (Mouse)
             {
-                direction = look - new Vector2(rb.position.x,rb.position.y);
+                look.y = rb.position.y;
+                direction = look - rb.position;
                 rb.rotation = Quaternion.LookRotation(direction);
-                print("Mouse");
             }
-            else */ rb.rotation = Quaternion.LookRotation(lookAtPos);
+            else  rb.rotation = Quaternion.LookRotation(lookAtPos);
         }
     }
 }

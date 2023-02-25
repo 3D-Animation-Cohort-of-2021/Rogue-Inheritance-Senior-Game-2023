@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 123869266}
   - component: {fileID: 123869265}
   - component: {fileID: 123869264}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TestFloor (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -369,6 +369,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 1178129221}
+  mouseLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!54 &190085469
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -548,7 +551,7 @@ GameObject:
   - component: {fileID: 653364872}
   - component: {fileID: 653364871}
   - component: {fileID: 653364870}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TestFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
