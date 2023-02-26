@@ -87,5 +87,12 @@ public class PlayerController : MonoBehaviour
             }
             else  rb.rotation = Quaternion.LookRotation(lookAtPos);
         }
+        else
+        {
+            if (move != Vector2.zero)
+            {
+                rb.rotation = Quaternion.LookRotation(new Vector3(move.x, 0,move.y));
+            }
+        }
     }
 }
