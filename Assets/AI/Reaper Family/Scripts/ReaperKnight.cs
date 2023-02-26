@@ -6,6 +6,7 @@ public class ReaperKnight : ReaperBase
     [SerializeField]private float grappleRange, meleeRange, chancetoGrapple, attackCheckTime, restTime;
 
     private WaitForSeconds attackCheckPeriod, restPeriod;
+    [SerializeField]private GameObject visualBox;
 
     [SerializeField]private bool isBusy;
     // Start is called before the first frame update
@@ -15,16 +16,15 @@ public class ReaperKnight : ReaperBase
         Debug.Log("This is a knight");
         attackCheckPeriod = new WaitForSeconds(attackCheckTime);
         restPeriod = new WaitForSeconds(restTime);
+        isDead = false;
+        visualBox.SetActive(false);
     }
     void Start()
     {
-        navAgent.SetDestination(playerCharacter.transform.position);
+        //navAgent.SetDestination(playerCharacter.transform.position);
+        lifeRoutine = StartCoroutine(KnightAttackRoutine());
     }
 
-    private void Update()
-    {
-        
-    }
 
     private IEnumerator KnightAttackRoutine()
     {
@@ -33,7 +33,6 @@ public class ReaperKnight : ReaperBase
         {
             if (!isBusy)
             {
-                yield return attackCheckPeriod;
                 distanceFromPlayer = Vector3.Distance(transform.position, playerCharacter.transform.position);
                 if (distanceFromPlayer <= meleeRange)
                 {
@@ -42,38 +41,97 @@ public class ReaperKnight : ReaperBase
                 }
                 else if (distanceFromPlayer <= grappleRange)
                 {
-                    if (Random.Range(0, 100) >= chancetoGrapple)
+                    if (Random.Range(0, 100) <= chancetoGrapple)
                     {
                         isBusy = true;
                         StartCoroutine(GrappleAttack());
                     }
-                    else Debug.Log("Grapple roll failed");
+                    else
+                    {
+                        ChaseAgain();
+                        //Debug.Log("Grapple roll failed");
+                    }
                 }
                 else
                 {
-                    //chase the player
+                    ChaseAgain();
+                    //Debug.Log("Chasing Player");
                 }
             }
+            yield return attackCheckPeriod;
         }
     }
 
     private IEnumerator MeleeAttack()
     {
+        StopChasing();
         Debug.Log("Performed a melee attack");
         yield return restPeriod;
         Debug.Log("DoneResting");
-        yield return restPeriod;
         isBusy = false;
     }
 
     private IEnumerator GrappleAttack()
     {
+        StopChasing();
         Debug.Log("StartingGrapple");
-        yield return new WaitForSeconds(1.5f);
-        Debug.Log("Grappled Player");
-        transform.position = playerCharacter.transform.position;
-        Debug.Log("SMACK");
+        transform.LookAt(playerCharacter.transform);
+        Debug.DrawRay(transform.position, transform.forward * 8f, Color.green, 1f);
+        visualBox.SetActive(true);
+        //visualSphere.transform.position = playerCharacter.transform.position;
+        yield return new WaitForSeconds(1f);
+        //
+        if (PlayerIsInArea(visualBox))
+        {
+            Debug.Log("Grappled Player");
+            transform.position = playerCharacter.transform.position;
+            Debug.Log("SMACK");
+        }
+        else Debug.Log("Whiffed!");
+        visualBox.SetActive(false);
         yield return restPeriod;
+        Debug.Log("Done Resting");
         isBusy = false;
+    }
+
+    private void StopChasing()
+    {
+        navAgent.enabled = false;
+    }
+
+    private void ChaseAgain()
+    {
+        navAgent.enabled = true;
+        navAgent.SetDestination(playerCharacter.transform.position);
+    }
+
+    private bool PlayerIsInRange(float range)
+    {
+        RaycastHit hitInfo;
+        if (Physics.Raycast(transform.position, transform.forward,  out hitInfo, range))
+        {
+            Debug.Log(hitInfo.collider.gameObject);
+            // Check if the ray hits a player character
+            if (hitInfo.collider.gameObject==playerCharacter)
+            {
+                Debug.Log("Hit player character!");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool PlayerIsInArea(GameObject examplebox)
+    {
+        Collider[] objectsInVolume = Physics.OverlapBox(examplebox.transform.position, examplebox.transform.localScale,
+            examplebox.transform.rotation);
+        foreach (Collider c in objectsInVolume)
+        {
+            if (c.gameObject == playerCharacter)
+                return true;
+        }
+
+        return false;
     }
 }

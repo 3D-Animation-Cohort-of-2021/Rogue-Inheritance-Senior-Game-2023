@@ -10,7 +10,8 @@ public class ReaperBase : MonoBehaviour
     [SerializeField] protected float totalHealth, currentHealth;
     
     protected NavMeshAgent navAgent;
-    protected bool isDead;
+    [SerializeField] protected bool isDead;
+    protected Coroutine lifeRoutine;
 
     [SerializeField] protected GameObject playerCharacter;
     // Start is called before the first frame update
@@ -24,6 +25,5 @@ public class ReaperBase : MonoBehaviour
     {
         isDead = true;
     }
-
-
+    
 }
