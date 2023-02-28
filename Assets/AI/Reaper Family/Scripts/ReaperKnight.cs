@@ -65,6 +65,7 @@ public class ReaperKnight : ReaperBase
     private IEnumerator MeleeAttack()
     {
         StopChasing();
+        transform.LookAt(playerCharacter.transform);
         Debug.Log("Performed a melee attack");
         yield return restPeriod;
         Debug.Log("DoneResting");
