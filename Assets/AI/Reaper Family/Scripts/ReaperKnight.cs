@@ -1,13 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class ReaperKnight : ReaperBase
 {
-    [SerializeField]private float grappleRange, meleeRange, chancetoGrapple, attackCheckTime, restTime;
+    [SerializeField]private float grappleRange, meleeRange, chancetoGrapple, attackCheckTime, restTime, grappleWindupTime;
 
     private WaitForSeconds attackCheckPeriod, restPeriod;
-    [SerializeField]private GameObject visualBox;
-
+    [SerializeField]private GameObject visualBox, decalObj;
+    private DecalProjector grappleProjector;
     [SerializeField]private bool isBusy;
     // Start is called before the first frame update
     protected new void Awake()
@@ -18,6 +19,9 @@ public class ReaperKnight : ReaperBase
         restPeriod = new WaitForSeconds(restTime);
         isDead = false;
         visualBox.SetActive(false);
+        grappleProjector = decalObj.GetComponent<DecalProjector>();
+        Material gMat = grappleProjector.material;
+        gMat.SetFloat("_Time_To_Fill", grappleWindupTime);
     }
     void Start()
     {
@@ -78,19 +82,24 @@ public class ReaperKnight : ReaperBase
         Debug.Log("StartingGrapple");
         transform.LookAt(playerCharacter.transform);
         Debug.DrawRay(transform.position, transform.forward * 8f, Color.green, 1f);
-        visualBox.SetActive(true);
-        //visualSphere.transform.position = playerCharacter.transform.position;
-        yield return new WaitForSeconds(1f);
+        //visualBox.SetActive(true);
+        StartCoroutine(DisplayGrappleWindup());
+        yield return new WaitForSeconds(grappleWindupTime);
         //
         if (PlayerIsInArea(visualBox))
         {
             Debug.Log("Grappled Player");
             transform.position = playerCharacter.transform.position;
+            //actualGrapple Function
             Debug.Log("SMACK");
         }
-        else Debug.Log("Whiffed!");
-        visualBox.SetActive(false);
-        yield return restPeriod;
+        else
+        {
+            Debug.Log("Whiffed!");
+            yield return restPeriod;
+        }
+        //visualBox.SetActive(false);
+        
         Debug.Log("Done Resting");
         isBusy = false;
     }
@@ -123,6 +132,20 @@ public class ReaperKnight : ReaperBase
         return false;
     }
 
+    private IEnumerator DisplayGrappleWindup()
+    {
+        float timeElapsed = 0f;
+        Material gMat = grappleProjector.material;
+        decalObj.SetActive(true);
+        while (timeElapsed <= grappleWindupTime)
+        {
+            timeElapsed += Time.deltaTime;
+            gMat.SetFloat("_Progress_Float", Mathf.Lerp(0,1, timeElapsed/grappleWindupTime));
+            yield return new WaitForEndOfFrame();
+        }
+        decalObj.SetActive(false);
+    }
+
     private bool PlayerIsInArea(GameObject examplebox)
     {
         Collider[] objectsInVolume = Physics.OverlapBox(examplebox.transform.position, examplebox.transform.localScale,
@@ -132,7 +155,6 @@ public class ReaperKnight : ReaperBase
             if (c.gameObject == playerCharacter)
                 return true;
         }
-
         return false;
     }
 }
