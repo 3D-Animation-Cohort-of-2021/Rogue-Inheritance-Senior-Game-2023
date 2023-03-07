@@ -4,12 +4,14 @@ using UnityEngine.Rendering.Universal;
 
 public class ReaperKnight : ReaperBase
 {
-    [SerializeField]private float grappleRange, meleeRange, chancetoGrapple, attackCheckTime, restTime, grappleWindupTime;
+    [SerializeField]private float grappleRange, meleeRange, chancetoGrapple, attackCheckTime, restTime, grappleWindupTime, meleeWindupTime;
 
     private WaitForSeconds attackCheckPeriod, restPeriod;
-    [SerializeField]private GameObject visualBox, decalObj;
+    [SerializeField]private GameObject visualBox, decalObj, diskObj;
     private DecalProjector grappleProjector;
     [SerializeField]private bool isBusy;
+    private Material dMat;
+
     // Start is called before the first frame update
     protected new void Awake()
     {
@@ -22,6 +24,9 @@ public class ReaperKnight : ReaperBase
         grappleProjector = decalObj.GetComponent<DecalProjector>();
         Material gMat = grappleProjector.material;
         gMat.SetFloat("_Time_To_Fill", grappleWindupTime);
+        dMat = diskObj.GetComponent<MeshRenderer>().material;
+        dMat.SetFloat("_Time_To_Fill", meleeWindupTime);
+
     }
     void Start()
     {
@@ -70,6 +75,8 @@ public class ReaperKnight : ReaperBase
     {
         StopChasing();
         transform.LookAt(playerCharacter.transform);
+        StartCoroutine(DisplayMeleeWindup());
+        yield return new WaitForSeconds(meleeWindupTime);
         Debug.Log("Performed a melee attack");
         yield return restPeriod;
         Debug.Log("DoneResting");
@@ -137,6 +144,7 @@ public class ReaperKnight : ReaperBase
         float timeElapsed = 0f;
         Material gMat = grappleProjector.material;
         decalObj.SetActive(true);
+        Debug.Log("MeleeVisual");
         while (timeElapsed <= grappleWindupTime)
         {
             timeElapsed += Time.deltaTime;
@@ -144,6 +152,20 @@ public class ReaperKnight : ReaperBase
             yield return new WaitForEndOfFrame();
         }
         decalObj.SetActive(false);
+    }
+
+    private IEnumerator DisplayMeleeWindup()
+    {
+        float timeElapsed = 0f;
+        Debug.Log("Starting windup");
+        diskObj.SetActive(true);
+        while (timeElapsed <= meleeWindupTime)
+        {
+            timeElapsed += Time.deltaTime;
+            dMat.SetFloat("_ProgressFloat", Mathf.Lerp(0,1, timeElapsed/meleeWindupTime));
+            yield return new WaitForEndOfFrame();
+        }
+        diskObj.SetActive(false);
     }
 
     private bool PlayerIsInArea(GameObject examplebox)
