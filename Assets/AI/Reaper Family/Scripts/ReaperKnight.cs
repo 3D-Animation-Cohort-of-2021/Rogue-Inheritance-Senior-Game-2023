@@ -88,7 +88,7 @@ public class ReaperKnight : ReaperBase
         StopChasing();
         Debug.Log("StartingGrapple");
         transform.LookAt(playerCharacter.transform);
-        Debug.DrawRay(transform.position, transform.forward * 8f, Color.green, 1f);
+        //Debug.DrawRay(transform.position, transform.forward * 8f, Color.green, 1f);
         //visualBox.SetActive(true);
         StartCoroutine(DisplayGrappleWindup());
         yield return new WaitForSeconds(grappleWindupTime);
@@ -96,7 +96,7 @@ public class ReaperKnight : ReaperBase
         if (PlayerIsInArea(visualBox))
         {
             Debug.Log("Grappled Player");
-            transform.position = playerCharacter.transform.position;
+            StartCoroutine(MoveToPlayer(.15f, playerCharacter.transform.position));
             //actualGrapple Function
             Debug.Log("SMACK");
         }
@@ -157,7 +157,7 @@ public class ReaperKnight : ReaperBase
     private IEnumerator DisplayMeleeWindup()
     {
         float timeElapsed = 0f;
-        Debug.Log("Starting windup");
+        //Debug.Log("Starting windup");
         diskObj.SetActive(true);
         while (timeElapsed <= meleeWindupTime)
         {
@@ -166,6 +166,20 @@ public class ReaperKnight : ReaperBase
             yield return new WaitForEndOfFrame();
         }
         diskObj.SetActive(false);
+    }
+
+    private IEnumerator MoveToPlayer(float travelTime, Vector3 targetLocation)
+    {
+        Vector3 startPos = transform.position;
+        float currentTime = 0f;
+        WaitForEndOfFrame wff = new WaitForEndOfFrame();
+        while (currentTime < travelTime)
+        {
+            currentTime += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, targetLocation, currentTime / travelTime);
+            yield return wff;
+        }
+
     }
 
     private bool PlayerIsInArea(GameObject examplebox)
@@ -179,4 +193,5 @@ public class ReaperKnight : ReaperBase
         }
         return false;
     }
+    
 }
