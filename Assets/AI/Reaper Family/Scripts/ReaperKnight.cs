@@ -4,21 +4,31 @@ using UnityEngine.Rendering.Universal;
 
 public class ReaperKnight : ReaperBase
 {
-    [SerializeField]private float grappleRange, meleeRange, chancetoGrapple, attackCheckTime, restTime, grappleWindupTime, meleeWindupTime;
+    [Header("General")]
+    [SerializeField] private float attackCheckTime;
+    [Header("Combat-Grapple")] 
+    [SerializeField] private float chancetoGrapple;
+    [SerializeField] private float grappleRange;
+    [SerializeField] private float grappleWindupTime;
+    [SerializeField] private float stunTime;
+    [Header("Combat-Melee")]  
+    [SerializeField] private float meleeWindupTime;
+    [SerializeField] private float meleeRange;
 
-    private WaitForSeconds attackCheckPeriod, restPeriod;
+    private WaitForSeconds attackCheckPeriod, stunPeriod;
     [SerializeField]private GameObject visualBox, decalObj, diskObj;
     private DecalProjector grappleProjector;
-    [SerializeField]private bool isBusy;
+    private bool isBusy;
     private Material dMat;
 
+    [SerializeField] private Animator meshAnimator;
     // Start is called before the first frame update
     protected new void Awake()
     {
         base.Awake();
         Debug.Log("This is a knight");
         attackCheckPeriod = new WaitForSeconds(attackCheckTime);
-        restPeriod = new WaitForSeconds(restTime);
+        stunPeriod = new WaitForSeconds(stunTime);
         isDead = false;
         visualBox.SetActive(false);
         grappleProjector = decalObj.GetComponent<DecalProjector>();
@@ -26,6 +36,7 @@ public class ReaperKnight : ReaperBase
         gMat.SetFloat("_Time_To_Fill", grappleWindupTime);
         dMat = diskObj.GetComponent<MeshRenderer>().material;
         dMat.SetFloat("_Time_To_Fill", meleeWindupTime);
+        meshAnimator = GetComponentInChildren<Animator>();
 
     }
     void Start()
@@ -78,8 +89,8 @@ public class ReaperKnight : ReaperBase
         StartCoroutine(DisplayMeleeWindup());
         yield return new WaitForSeconds(meleeWindupTime);
         Debug.Log("Performed a melee attack");
-        yield return restPeriod;
-        Debug.Log("DoneResting");
+        meshAnimator.SetTrigger("MeleeAttack");
+        yield return new WaitForSeconds(1f);
         isBusy = false;
     }
 
@@ -92,18 +103,22 @@ public class ReaperKnight : ReaperBase
         //visualBox.SetActive(true);
         StartCoroutine(DisplayGrappleWindup());
         yield return new WaitForSeconds(grappleWindupTime);
+        meshAnimator.SetTrigger("GrappleLaunch");
+        yield return new WaitForSeconds(.3f);
         //
         if (PlayerIsInArea(visualBox))
         {
             Debug.Log("Grappled Player");
             StartCoroutine(MoveToPlayer(.15f, playerCharacter.transform.position));
-            //actualGrapple Function
+            meshAnimator.SetTrigger("GrappleYes");
             Debug.Log("SMACK");
         }
         else
         {
             Debug.Log("Whiffed!");
-            yield return restPeriod;
+            meshAnimator.SetTrigger("GrappleNo");
+            yield return stunPeriod;
+            meshAnimator.SetTrigger("StopStun");
         }
         //visualBox.SetActive(false);
         
@@ -114,12 +129,14 @@ public class ReaperKnight : ReaperBase
     private void StopChasing()
     {
         navAgent.enabled = false;
+        meshAnimator.SetBool("Chasing", false);
     }
 
     private void ChaseAgain()
     {
         navAgent.enabled = true;
         navAgent.SetDestination(playerCharacter.transform.position);
+        meshAnimator.SetBool("Chasing", true);
     }
 
     private bool PlayerIsInRange(float range)
@@ -143,6 +160,7 @@ public class ReaperKnight : ReaperBase
     {
         float timeElapsed = 0f;
         Material gMat = grappleProjector.material;
+        meshAnimator.SetTrigger("GrappleStart");
         decalObj.SetActive(true);
         Debug.Log("MeleeVisual");
         while (timeElapsed <= grappleWindupTime)
@@ -159,6 +177,7 @@ public class ReaperKnight : ReaperBase
         float timeElapsed = 0f;
         //Debug.Log("Starting windup");
         diskObj.SetActive(true);
+        meshAnimator.SetTrigger("MeleeWindup");
         while (timeElapsed <= meleeWindupTime)
         {
             timeElapsed += Time.deltaTime;
